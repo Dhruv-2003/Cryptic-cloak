@@ -77,6 +77,22 @@ enum Commands {
         #[arg(short, long, required = true, value_name = "HEX")]
         ephemeralpub: Option<String>,
     },
+    CheckStealth {
+        #[arg(short, long, required = true, value_name = "HEX")]
+        spendingkey: Option<String>,
+
+        #[arg(short, long, required = true, value_name = "HEX")]
+        viewingkey: Option<String>,
+        /// 0x prefixed 20 byte hex encoded ethereum stealth address
+        #[arg(short, long, required = true, value_name = "HEX")]
+        stealthaddr: Option<String>,
+        /// 0x prefixed 33 byte hex encoded secp256k1 ephemeral pubkey
+        #[arg(short, long, required = true, value_name = "HEX")]
+        ephemeralpub: Option<String>,
+
+        #[arg(short, long, required = true, value_name = "HEX")]
+        viewtag: Option<u8>,
+    },
     /// scan announced stealth addresses for payments to your stealth meta address
     Scan {
         /// path to keyfile containing stealth meta address private keys
@@ -166,6 +182,37 @@ fn main() {
 
             reveal_stealth_key_nofile(sk, vk, sa, ep);
         }
+        Some(Commands::CheckStealth {
+            stealthaddr,
+            ephemeralpub,
+            spendingkey,
+            viewingkey,
+            viewtag,
+        }) => {
+            let sk = match spendingkey {
+                Some(spendingkey) => spendingkey,
+                None => panic!("missing required --spendingkey argument (-s)"),
+            };
+
+            let vk = match viewingkey {
+                Some(viewingkey) => viewingkey,
+                None => panic!("missing required --viewingkey argument (-v)"),
+            };
+            let vt = match viewtag {
+                Some(viewtag) => viewtag,
+                None => panic!("missing required --viewtag argument (-v)"),
+            };
+            let sa = match stealthaddr {
+                Some(stealthaddr) => stealthaddr,
+                None => panic!("missing required --stealthaddr argument (-s)"),
+            };
+            let ep = match ephemeralpub {
+                Some(ephemeralpub) => ephemeralpub,
+                None => panic!("missing required --ephemeralpub argument (-e)"),
+            };
+
+            check_stealth(sa, ep, vk, sk, *vt);
+        }
         Some(Commands::Scan { keyfile, scanfile }) => {
             let kf = match keyfile {
                 Some(keyfile) => keyfile,
@@ -178,6 +225,7 @@ fn main() {
 
             scan_for_payments(kf, sf);
         }
+
         Some(Commands::ShowMetaAddress { keyfile }) => match keyfile {
             Some(keyfile) => show_meta_address(keyfile),
             None => panic!("missing required --keyfile argument (-k)"),
@@ -271,6 +319,28 @@ fn reveal_stealth_key_nofile(
     );
     // ------ STEALTH ADDRESS PRIVATE KEY ------\n
     println!("{}", hexlify(&key));
+}
+
+fn check_stealth(
+    stealth_address: &String,
+    ephemeral_pubkey: &String,
+    viewing_key: &String,
+    spending_key: &String,
+    view_tag: u8,
+) {
+    let sk = unhexlify(&spending_key).as_slice().try_into().unwrap();
+    let vk = unhexlify(&viewing_key).as_slice().try_into().unwrap();
+    let spending_pubkey = encode_pubkey(get_pubkey_from_priv(decode_priv(&sk)));
+
+    let check = check_stealth_address_fast(
+        unhexlify(&stealth_address).as_slice().try_into().unwrap(),
+        unhexlify(&ephemeral_pubkey).as_slice().try_into().unwrap(),
+        &vk,
+        &spending_pubkey,
+        view_tag,
+    );
+    // ------ STEALTH ADDRESS PRIVATE KEY ------\n
+    println!("{}", check);
 }
 
 fn scan_for_payments(keyfile: &PathBuf, scanfile: &PathBuf) {

@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import sha256 from "sha256";
 import { privateKeyToAccount } from "viem/accounts";
-import { useNetwork } from "wagmi";
 import {
   Modal,
   ModalOverlay,
@@ -16,6 +15,7 @@ import {
   useDisclosure,
   Button,
 } from "@chakra-ui/react";
+import { updateAnnouncement, updateRegister } from "@/utils/rollupMethods";
 
 const Navbar = () => {
   const { address: account } = useAccount();
@@ -47,6 +47,25 @@ const Navbar = () => {
       setSpendingKey(`0x${privateKey}`);
       setViewingKey(`0x${privateKey}`);
       onOpen();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+  const registerMetaAddress = async () => {
+    try {
+      // await updateRegister(
+      //   "0xCB5160610F4655B938eE67729fD542AFb5d1586F",
+      //   "0x025227b7d6a0163ac13dc25854c8da65ea84a3994e3b0fb56debebac4e75ba2d7e025227b7d6a0163ac13dc25854c8da65ea84a3994e3b0fb56debebac4e75ba2d7e",
+      //   0
+      // );
+
+      await updateAnnouncement(
+        "0xf056c1bbf293799910ac551f405ac91e28e1d831",
+        "0x0397fce4b5618ea3c2f125b44e04d708b3318b9e3df4fb733d0002d105288fd54b",
+        237
+      );
     } catch (error) {
       console.log(error);
     }

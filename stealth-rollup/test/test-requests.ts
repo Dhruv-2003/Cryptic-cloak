@@ -36,7 +36,7 @@ const getData = async () => {
     AnnounceData
   );
 
-  // console.log(actionInput.EIP712TypedData.types);
+  console.log(actionInput.EIP712TypedData.types);
 
   const payload = JSON.stringify({
     msgSender: wallet.address,

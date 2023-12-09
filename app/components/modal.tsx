@@ -13,7 +13,10 @@ import {
   useSteps,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { getUserMetadatAddress } from "@/utils/rollupMethods";
+import {
+  getUserMetadatAddress,
+  updateAnnouncement,
+} from "@/utils/rollupMethods";
 import { getStealthAddress } from "@/utils/stealthMethods";
 import {
   erc20ABI,
@@ -40,7 +43,7 @@ const Modal = () => {
     schemeId: string;
     stealthAddress: `0x${string}`;
     ephemeralPublicKey: string;
-    viewTag: string;
+    viewTag: number;
   }>();
   const [page, setPage] = useState<number>(0);
   const [transactionHash, setTransactionHash] = useState<string>();
@@ -169,12 +172,19 @@ const Modal = () => {
       }
 
       // update the Registery contract with the stealth address data
+      await updateAnnouncement(
+        stealthAddressData.stealthAddress,
+        stealthAddressData.ephemeralPublicKey,
+        stealthAddressData.viewTag
+      );
 
       // await handleStepper();
     } catch (error) {
       console.log(error);
     }
   };
+
+  // scan for the user's ephemeral public key set
 
   return (
     <div className="w-screen bg-gradient-to-r from-white via-blue-100 to-rose-200">

@@ -3,10 +3,12 @@ import Navbar from "@/components/navbar";
 import {
   getAnnouncements,
   getRegisters,
+  scanAnnouncemets,
   updateAnnouncement,
   updateRegister,
 } from "@/utils/rollupMethods";
 import {
+  checkStealth,
   getStealthAddress,
   getStealthMetaAddress,
   revealStealthKey,
@@ -92,6 +94,27 @@ export default function Home() {
     );
   };
 
+  const checkFlow3 = async () => {
+    // const data = await checkStealth(
+    //   "0x6d2f70a47ddf455feb6a785b9787265f28897546bd1316224300aed627ef8cfc",
+    //   "0xa2e9f98f845bb6a8d2db0a2a17a9d185fc97afd1b7949983ee367f9f08a5e0b7",
+    //   "0x084c53dad73b23f7d709fdcc2edbe5caa44bccce",
+    //   "0x0391e14240e98bc771f00b5ad49f3f7ec92fd498e43f04708fd61f02fddc0931f2",
+    //   33
+    // );
+    // console.log(data);
+    if (!spendingKey) {
+      console.log("No Spending Key Found");
+      return;
+    }
+    if (!viewingKey) {
+      console.log("No Viewing Key Found");
+      return;
+    }
+    const data = await scanAnnouncemets(spendingKey, viewingKey);
+    console.log(data);
+  };
+
   const signAndGenerateKey = async () => {
     try {
       if (!walletClient) {
@@ -123,7 +146,7 @@ export default function Home() {
       <div className="flex flex-col justify-center mx-auto w-full">
         <Navbar />
         <div className="mx-auto w-full">
-          {/* <button
+          <button
             onClick={() => {
               signAndGenerateKey();
             }}
@@ -143,7 +166,14 @@ export default function Home() {
             }}
           >
             checkFlow2
-          </button> */}
+          </button>
+          <button
+            onClick={() => {
+              checkFlow3();
+            }}
+          >
+            checkFlow3
+          </button>
           <Modal />
         </div>
       </div>

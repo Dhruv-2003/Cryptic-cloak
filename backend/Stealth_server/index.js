@@ -6,6 +6,7 @@ const {
   getStealthAddress,
   revealStealthKey,
   revealStealthKeyNoFile,
+  checkStealth,
 } = require("./main.js");
 const app = express();
 var cors = require("cors");
@@ -56,6 +57,32 @@ app.post("/revealStealthKeyNoFile", async (req, res) => {
       viewingKey,
       stealthAddress,
       ephemeralPublicKey
+    );
+    console.log(data);
+    res.status(201).send({ data });
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({ message: "error" });
+  }
+});
+
+app.post("/checkStealth", async (req, res) => {
+  console.log(req.body);
+  const {
+    spendingKey,
+    viewingKey,
+    stealthAddress,
+    ephemeralPublicKey,
+    viewTag,
+  } = req.body;
+
+  try {
+    const data = await checkStealth(
+      spendingKey,
+      viewingKey,
+      stealthAddress,
+      ephemeralPublicKey,
+      viewTag
     );
     console.log(data);
     res.status(201).send({ data });
