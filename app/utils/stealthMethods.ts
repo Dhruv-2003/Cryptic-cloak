@@ -5,7 +5,7 @@
 const getStealthMetaAddress = async (
   spendingKey: string,
   viewingKey: string
-) => {
+): Promise<string | undefined> => {
   try {
     const res = await fetch("http://localhost:3030/getMetadataAddress", {
       method: "POST",
@@ -27,13 +27,24 @@ const getStealthMetaAddress = async (
         console.log(err);
       });
 
-    console.log(res);
+    console.log(res.data);
+    return res.data;
   } catch (error) {
     console.log(error);
   }
 };
 
-const getStealthAddress = async (metaAddress: string) => {
+const getStealthAddress = async (
+  metaAddress: string
+): Promise<
+  | {
+      schemeId: string;
+      stealthAddress: string;
+      ephemeralPublicKey: string;
+      viewTag: string;
+    }
+  | undefined
+> => {
   try {
     const res = await fetch("http://localhost:3030/getStealthAddress", {
       method: "POST",
@@ -48,13 +59,32 @@ const getStealthAddress = async (metaAddress: string) => {
         console.log(res);
         const data = await res.json();
         console.log(data);
-        return res;
+        return data;
       })
       .catch((err) => {
         console.log(err);
       });
+    // const res =
+    //   "schemeId:0|stealth_address:0x73c4356556ea3da24583cb84bcf0be532f835459|ephepmeral_pubkey:0x0292e1da1650a433755158a4c820987ca52c80343a9c6b9578358634f334542a99|view_tag:78";
+    const resdata = res.data;
+    if (resdata?.startsWith("schemeId")) {
+      const data = resdata.split("|");
+      const schemeId = data[0].split(":")[1];
+      const stealthAddress = data[1].split(":")[1];
+      const ephemeralPublicKey = data[2].split(":")[1];
+      const viewTag = data[3].split(":")[1];
 
-    console.log(res);
+      console.log(schemeId, stealthAddress, ephemeralPublicKey, viewTag);
+      return {
+        schemeId,
+        stealthAddress,
+        ephemeralPublicKey,
+        viewTag,
+      };
+    } else {
+      return undefined;
+    }
+
     // console.log(await res);
   } catch (error) {
     console.log(error);
@@ -66,7 +96,7 @@ const revealStealthKey = async (
   viewingKey: string,
   stealthAddress: string,
   ephemeralPublicKey: string
-) => {
+): Promise<string | undefined> => {
   try {
     const res = await fetch("http://localhost:3030/revealStealthKeyNoFile", {
       method: "POST",
@@ -84,14 +114,17 @@ const revealStealthKey = async (
         console.log(res);
         const data = await res.json();
         console.log(data);
-        return res;
+        return data;
       })
       .catch((err) => {
         console.log(err);
       });
 
-    console.log(res);
+    console.log(res.data);
+    return res.data;
   } catch (error) {
     console.log(error);
   }
 };
+
+export { getStealthMetaAddress, getStealthAddress, revealStealthKey };
