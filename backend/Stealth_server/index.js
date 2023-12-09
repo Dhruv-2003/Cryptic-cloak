@@ -1,7 +1,11 @@
 // create a basic http server using express
 const express = require("express");
 const bodyParser = require("body-parser");
-const { getMetaAddress } = require("./main.js");
+const {
+  getMetaAddress,
+  getStealthAddress,
+  revealStealthKey,
+} = require("./main.js");
 const app = express();
 var cors = require("cors");
 app.use(cors());
@@ -17,13 +21,47 @@ app.post("/getMetadataAddress", async (req, res) => {
   const { spendingKey, viewingKey } = req.body;
 
   try {
-    const data = getMetaAddress(spendingKey, viewingKey);
+    const data = await getMetaAddress(spendingKey, viewingKey);
+    console.log(data);
     res.status(201).send({ data });
   } catch (error) {
     console.log(error);
+    res.status(400).send({ message: "error" });
   }
+});
 
-  res.send("Hello World");
+app.post("/getStealthAddress", async (req, res) => {
+  console.log(req.body);
+  const { metaAddress } = req.body;
+
+  try {
+    const data = await getStealthAddress(metaAddress);
+    console.log(data);
+    res.status(201).send({ data });
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({ message: "error" });
+  }
+});
+
+app.post("/revealStealthKeyNoFile", async (req, res) => {
+  console.log(req.body);
+  const { spendingKey, viewingKey, stealthAddress, ephemeralAddress } =
+    req.body;
+
+  try {
+    const data = await revealStealthKey(
+      spendingKey,
+      viewingKey,
+      stealthAddress,
+      ephemeralAddress
+    );
+    console.log(data);
+    res.status(201).send({ data });
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({ message: "error" });
+  }
 });
 
 // listen for requests
