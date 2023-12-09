@@ -20,6 +20,7 @@ import {
   StepTitle,
   Stepper,
   useSteps,
+  Button,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import {
@@ -39,12 +40,25 @@ import {
 import { createWalletClient, http, parseEther } from "viem";
 import sha256 from "sha256";
 import { privateKeyToAccount } from "viem/accounts";
+import { RepeatIcon, CheckCircleIcon } from "@chakra-ui/icons";
+import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+  AlertDialogCloseButton,
+  useDisclosure,
+} from "@chakra-ui/react";
 
 const Modal = () => {
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
   const { chain, chains } = useNetwork();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const cancelRef = React.useRef();
 
   const [receiverAddress, setReceieverAddress] = useState<`0x${string}`>();
   const [stealthMetaAddress, setStealthMetaAddress] = useState<string>();
@@ -66,6 +80,7 @@ const Modal = () => {
   const [transactionHash, setTransactionHash] = useState<string>();
   const [scanData, setScanData] = useState<Annoucement[]>();
   const [chooseStealthAddress, setChooseStealthAddress] = useState<string>();
+  const [announced, setAnnounced] = useState<boolean>(false);
 
   const { selectedIndex, setSelectedIndex } = useTabs({});
 
@@ -230,6 +245,7 @@ const Modal = () => {
       );
 
       await handleStepper();
+      await setAnnounced(true);
     } catch (error) {
       console.log(error);
     }
@@ -517,8 +533,7 @@ const Modal = () => {
                               Transaction hash
                             </p>
                             <p className="text-lg mt-1 text-gray-600">
-                              {transactionHash?.slice(0, 15)}....
-                              {transactionHash?.slice(-5)}
+                              ({chain?.blockExplorers}/tx/${transactionHash})
                             </p>
                           </div>
                           <div className="w-full flex mt-6 justify-between">
@@ -548,21 +563,28 @@ const Modal = () => {
                   )}
                   {activeStep == 2 && (
                     <div>
-                      <div className="mt-5 flex flex-col"></div>
-                      <div className="mt-2 mx-auto">
-                        <button
-                          onClick={() => handleAnnounce()}
-                          className="px-6 mx-auto flex justify-center py-2 bg-blue-500 text-white text-xl rounded-xl font-semibold border hover:scale-105 hover:bg-white hover:border-blue-500 hover:text-blue-500 duration-200"
-                        >
-                          Announce Stealth Address
-                        </button>
-                      </div>
-                      <div className="mt-3 flex justify-center text-center mx-auto mb-3">
-                        <p className="text-sm text-gray-500 w-2/3 text-center">
-                          The identity of the receiver will be masked using the
-                          stealth address
-                        </p>
-                      </div>
+                      {!announced ? (
+                        <div className="mt-5 flex flex-col">
+                          <div className="mx-auto">
+                            <button
+                              onClick={() => handleAnnounce()}
+                              className="px-6 mx-auto flex justify-center py-2 bg-blue-500 text-white text-xl rounded-xl font-semibold border hover:scale-105 hover:bg-white hover:border-blue-500 hover:text-blue-500 duration-200"
+                            >
+                              Announce Stealth Address
+                            </button>
+                          </div>
+                          <div className="mt-3 flex justify-center text-center mx-auto mb-3">
+                            <p className="text-sm text-gray-500 w-2/3 text-center">
+                              The identity of the receiver will be masked using
+                              the stealth address
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="mt-10 flex flex-col justify-center mx-auto">
+                          <CheckCircleIcon className="text-3xl" color="green" />
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -570,12 +592,25 @@ const Modal = () => {
               <TabPanel>
                 <div className="flex flex-col px-6 py-2 bg-white rounded-xl w-full mt-6">
                   <p className="font-mono text-md">Withdraw</p>
+                  <div className="mt-4 flex flex-col">
+                    <p className="text-md text-gray-600">Sending Funds from</p>
+                    <p className="text-sm mt-1.5 text-gray-600">
+                      {chooseStealthAddress}
+                    </p>
+                  </div>
                   <div className="mt-5 flex flex-col">
                     <p className="text-md text-gray-600">amount</p>
-                    <input
-                      className="px-4 mt-2 py-3 border border-gray-100 rounded-xl text-2xl w-[420px]"
-                      placeholder="0"
-                    ></input>
+                    <div className="flex w-full items-center">
+                      <input
+                        className="px-4 mt-2 py-3 border border-gray-100 rounded-xl text-2xl w-3/4"
+                        placeholder="0"
+                        onChange={(e) => setAmount(e.target.value)}
+                      ></input>
+                      <select className="mx-2 bg-white border border-blue-500 h-12 mt-1 rounded-xl px-1 py-0.5 text-md text-blue-500 font-semibold w-1/3">
+                        <option value="1">{chain?.name}</option>
+                        {chain?.id == 80001 && <option value="2">Link</option>}
+                      </select>
+                    </div>
                   </div>
                   <div className="mt-5 flex flex-col">
                     <p className="text-md text-gray-600">
@@ -587,7 +622,10 @@ const Modal = () => {
                     ></input>
                   </div>
                   <div className="mt-7 mx-auto">
-                    <button className="px-6 py-2 bg-blue-500 text-white text-xl rounded-xl font-semibold border hover:scale-105 hover:bg-white hover:border-blue-500 hover:text-blue-500 duration-200">
+                    <button
+                      onClick={() => handleWithdraw()}
+                      className="px-6 py-2 bg-blue-500 text-white text-xl rounded-xl font-semibold border hover:scale-105 hover:bg-white hover:border-blue-500 hover:text-blue-500 duration-200"
+                    >
                       Withdraw
                     </button>
                   </div>
@@ -601,32 +639,93 @@ const Modal = () => {
               </TabPanel>
               <TabPanel>
                 <div className="flex flex-col w-[460px] px-6 py-2 bg-white rounded-xl mt-6">
-                  <p className="text-md text-gray-600">Stealth Addresses</p>
+                  <div className="flex w-full justify-between">
+                    <p className="text-md text-gray-600">Stealth Addresses</p>
+                    <RepeatIcon
+                      className=" cursor-pointer text-xl"
+                      onClick={() => handleScan()}
+                    />
+                  </div>
                   <div className="mt-7 flex flex-col">
                     {scanData &&
                       scanData.map((data) => {
                         return (
-                          <li
-                            key={data.stealthAddress}
-                            className={`${
-                              chooseStealthAddress && "border-blue-500"
-                            } border px-3 w-full py-1 mt-2 rounded-xl bg-slate-100`}
-                            onClick={() =>
-                              setChooseStealthAddress(data.stealthAddress)
-                            }
-                          >
-                            {data.stealthAddress}
-                          </li>
+                          <ul>
+                            <li
+                              key={data.stealthAddress}
+                              className={`${
+                                chooseStealthAddress &&
+                                "border-blue-500 cursor-pointer"
+                              } border px-3 w-full py-1 mt-2 rounded-xl bg-slate-100 cursor-pointer`}
+                              onClick={() => {
+                                setChooseStealthAddress(data.stealthAddress);
+                                setStealthAddressData({
+                                  schemeId: "",
+                                  stealthAddress: data.stealthAddress,
+                                  ephemeralPublicKey: data.ephemeralPublicKey,
+                                  viewTag: data.viewTag,
+                                });
+                              }}
+                            >
+                              {data.stealthAddress}
+                            </li>
+                          </ul>
                         );
                       })}
                   </div>
-                  <div className="flex justify-center mx-auto">
+                  <div className="flex flex-col justify-center mx-auto mt-6 w-full">
+                    {spendingKey ? (
+                      <button
+                        onClick={() => handleSwitchToTab(1)}
+                        className="px-6 py-2 w-2/3 mx-auto bg-blue-500 text-white text-xl rounded-xl font-semibold border hover:scale-105 hover:bg-white hover:border-blue-500 hover:text-blue-500 duration-200"
+                      >
+                        Withdraw
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => signAndGenerateKey()}
+                        className="px-6 py-2 w-2/3 mx-auto bg-blue-500 text-white text-xl rounded-xl font-semibold border hover:scale-105 hover:bg-white hover:border-blue-500 hover:text-blue-500 duration-200"
+                      >
+                        Login
+                      </button>
+                    )}
                     <button
-                      onClick={() => handleSwitchToTab(1)}
-                      className="px-6 py-2 bg-blue-500 text-white text-xl rounded-xl font-semibold border hover:scale-105 hover:bg-white hover:border-blue-500 hover:text-blue-500 duration-200"
+                      onClick={() => {
+                        handleRevealStealthKey();
+                        onOpen();
+                      }}
+                      className="px-6 mt-6 py-2 w-2/3 mx-auto bg-blue-500 text-white text-xl rounded-xl font-semibold border hover:scale-105 hover:bg-white hover:border-blue-500 hover:text-blue-500 duration-200"
                     >
-                      Withdraw
+                      Reveal
                     </button>
+                    {/* <div className="mt-3 flex justify-center text-center mx-auto mb-3">
+                      <p className="text-sm text-gray-500 w-[300px] text-center">
+                        Stealth Private Key
+                      </p>
+                      <p className="text-sm text-gray-500 w-[300px] text-center">
+                        {stealthKey}
+                      </p>
+                    </div> */}
+                    <AlertDialog
+                      leastDestructiveRef={cancelRef}
+                      isOpen={isOpen}
+                      onClose={onClose}
+                    >
+                      <AlertDialogOverlay>
+                        <AlertDialogContent>
+                          <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                            Stealth Private Key
+                          </AlertDialogHeader>
+
+                          <AlertDialogBody>{stealthKey}</AlertDialogBody>
+                          <AlertDialogFooter>
+                            <Button ref={cancelRef} onClick={onClose}>
+                              Close
+                            </Button>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialogOverlay>
+                    </AlertDialog>
                   </div>
                 </div>
               </TabPanel>

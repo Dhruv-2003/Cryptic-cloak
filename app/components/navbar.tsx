@@ -114,10 +114,11 @@ const Navbar = () => {
                   User app-specific Address
                 </p>
                 <p className="text-lg text-gray-800">
-                  {userAddress.slice(0, 10)}....
-                  {userAddress.slice(-15)}
+                  {/* {userAddress.slice(0, 10)}....
+                  {userAddress.slice(-15)} */}
+                  {userAddress}
                 </p>
-                <p className="text-md text-gray-600">
+                <p className="text-md mt-10 text-gray-600">
                   Stealth Meta data Address
                 </p>
                 {stealthMetaAddress ? (
@@ -128,7 +129,7 @@ const Navbar = () => {
                 ) : (
                   <button
                     onClick={() => getMetaAddress()}
-                    className="px-6 mx-auto flex justify-center py-2 bg-blue-500 text-white text-xl rounded-xl font-semibold border hover:scale-105 hover:bg-white hover:border-blue-500 hover:text-blue-500 duration-200"
+                    className="px-6 mt-6 mx-auto flex justify-center py-2 bg-blue-500 text-white text-xl rounded-xl font-semibold border hover:scale-105 hover:bg-white hover:border-blue-500 hover:text-blue-500 duration-200"
                   >
                     Generate
                   </button>
@@ -136,7 +137,7 @@ const Navbar = () => {
 
                 <p className="text-lg text-gray-800"></p>
               </div>
-              <div className="mt-4 flex flex-col">
+              <div className="mt-6 flex flex-col">
                 <button
                   onClick={() => registerMetaAddress()}
                   className="px-6 mx-auto flex justify-center py-2 bg-blue-500 text-white text-xl rounded-xl font-semibold border hover:scale-105 hover:bg-white hover:border-blue-500 hover:text-blue-500 duration-200"
