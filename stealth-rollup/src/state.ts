@@ -46,7 +46,7 @@ class AnnouncementTransport {
   createTree(announcements: Annoucement[], registers: Register[]) {
     const hashedLeavesAnnouncement = announcements.map((leaf: Annoucement) => {
       return ethers.solidityPackedKeccak256(
-        ["address", "bytes", "uint16"],
+        ["address", "bytes33", "uint16"],
         [leaf.stealthAddress, leaf.ephemeralPublicKey, leaf.viewTag]
       );
     });
@@ -55,7 +55,7 @@ class AnnouncementTransport {
 
     const hashedLeavesRegister = registers.map((leaf: Register) => {
       return ethers.solidityPackedKeccak256(
-        ["address", "bytes", "uint16"],
+        ["address", "bytes66", "uint16"],
         [leaf.publicAddress, leaf.stelathMetaAddress, leaf.schemeId]
       );
     });
@@ -85,6 +85,7 @@ export class AnnouncementRollup extends RollupState<
   }
 
   createTransport(state: AnnouncementVariable): AnnouncementTransport {
+    console.log(state);
     const newTree = new AnnouncementTransport(
       state.announcements,
       state.registers
@@ -127,6 +128,8 @@ export const announcementSTF: STF<AnnouncementRollup, AnnouncementActionInput> =
           schemeId: inputs.schemeId,
         };
         newState.registers.push(newRegister);
+        // const arrays = newState.registers;
+        // arrays.findIndex((element) => element.publicAddress === inputs.publicAddress);
         state.transport.registerLeaves = newState.registers;
       } else {
         throw new Error("Not implemented");

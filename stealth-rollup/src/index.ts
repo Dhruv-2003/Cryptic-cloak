@@ -10,7 +10,10 @@ import * as genesisState from "../genesis-state.json";
 
 const rollup = async () => {
   const counterFsm = new StateMachine({
-    state: new AnnouncementRollup(genesisState.state),
+    state: new AnnouncementRollup({
+      announcements: [],
+      registers: [],
+    }),
     stf: announcementSTF,
   });
 
@@ -76,8 +79,8 @@ app.post("/", async (req: Request, res: Response) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log("listening on port 3000");
+app.listen(8080, () => {
+  console.log("listening on port 8080");
 });
 
 // actionEventsEmitter.on(ActionEvents.SUBMIT_ACTION, (data) => {
