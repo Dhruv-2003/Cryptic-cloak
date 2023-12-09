@@ -1,5 +1,14 @@
 import React from "react";
-import { Tabs, TabList, TabPanels, Tab, TabPanel, Box } from "@chakra-ui/react";
+import {
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
+  Box,
+  useTabs,
+  useTab,
+} from "@chakra-ui/react";
 import {
   Step,
   StepDescription,
@@ -55,6 +64,14 @@ const Modal = () => {
   const [stealthKey, setStealthKey] = useState<string>();
   const [page, setPage] = useState<number>(0);
   const [transactionHash, setTransactionHash] = useState<string>();
+  const [scanData, setScanData] = useState<Annoucement[]>();
+  const [chooseStealthAddress, setChooseStealthAddress] = useState<string>();
+
+  const { selectedIndex, setSelectedIndex } = useTabs({});
+
+  const handleSwitchToTab = (tabIndex: number) => {
+    setSelectedIndex(tabIndex);
+  };
 
   const steps = [
     { title: "Generation", description: "Stealth Address" },
@@ -227,6 +244,7 @@ const Modal = () => {
       }
       const data = await scanAnnouncemets(spendingKey, viewingKey);
       console.log(data);
+      setScanData(data);
       if (data) {
         setAnnouncements(data);
       }
@@ -303,12 +321,19 @@ const Modal = () => {
     <div className="w-screen bg-gradient-to-r from-white via-blue-100 to-rose-200">
       <div className="flex flex-col mx-auto justify-between w-full">
         <div className="mt-20 flex mx-auto justify-center">
-          <Tabs variant="soft-rounded" colorScheme="blue">
+          <Tabs index={selectedIndex} variant="soft-rounded" colorScheme="blue">
             <div className="flex mx-auto px-2 w-[300px] py-1 bg-white rounded-xl">
               <TabList>
-                <Tab>Transfer</Tab>
-                <Tab>Withdraw</Tab>
-                <Tab>History</Tab>
+                <Tab onClick={() => setSelectedIndex(0)}>Transfer</Tab>
+                <Tab onClick={() => setSelectedIndex(1)}>Withdraw</Tab>
+                <Tab
+                  onClick={() => {
+                    setSelectedIndex(2);
+                    handleScan();
+                  }}
+                >
+                  Scan
+                </Tab>
               </TabList>
             </div>
             <TabPanels>
@@ -432,6 +457,14 @@ const Modal = () => {
                     <div>
                       {!checkTokenTransfer && (
                         <div className="flex flex-col">
+                          <div className="mt-4 flex flex-col">
+                            <p className="text-md text-gray-600">
+                              Sending Funds from
+                            </p>
+                            <p className="text-lg mt-1 text-gray-600">
+                              {chooseStealthAddress}
+                            </p>
+                          </div>
                           <div className="mt-5 flex flex-col">
                             <p className="text-md text-gray-600">amount</p>
                             <div className="flex w-full items-center">
@@ -568,10 +601,33 @@ const Modal = () => {
               </TabPanel>
               <TabPanel>
                 <div className="flex flex-col w-[460px] px-6 py-2 bg-white rounded-xl mt-6">
-                  <p className="text-lg text-center text-gray-600">
-                    Make your first Transfer or Withdrawal to create your
-                    History.
-                  </p>
+                  <p className="text-md text-gray-600">Stealth Addresses</p>
+                  <div className="mt-7 flex flex-col">
+                    {scanData &&
+                      scanData.map((data) => {
+                        return (
+                          <li
+                            key={data.stealthAddress}
+                            className={`${
+                              chooseStealthAddress && "border-blue-500"
+                            } border px-3 w-full py-1 mt-2 rounded-xl bg-slate-100`}
+                            onClick={() =>
+                              setChooseStealthAddress(data.stealthAddress)
+                            }
+                          >
+                            {data.stealthAddress}
+                          </li>
+                        );
+                      })}
+                  </div>
+                  <div className="flex justify-center mx-auto">
+                    <button
+                      onClick={() => handleSwitchToTab(1)}
+                      className="px-6 py-2 bg-blue-500 text-white text-xl rounded-xl font-semibold border hover:scale-105 hover:bg-white hover:border-blue-500 hover:text-blue-500 duration-200"
+                    >
+                      Withdraw
+                    </button>
+                  </div>
                 </div>
               </TabPanel>
             </TabPanels>
