@@ -7,7 +7,6 @@ import {
   TabPanel,
   Box,
   useTabs,
-  useTab,
 } from "@chakra-ui/react";
 import {
   Step,
@@ -51,6 +50,7 @@ import {
   AlertDialogCloseButton,
   useDisclosure,
 } from "@chakra-ui/react";
+import { useToast } from '@chakra-ui/react'
 
 const Modal = () => {
   const { address: account } = useAccount();
@@ -75,6 +75,7 @@ const Modal = () => {
     ephemeralPublicKey: string;
     viewTag: number;
   }>();
+  const toast = useToast()
   const [stealthKey, setStealthKey] = useState<string>();
   const [page, setPage] = useState<number>(0);
   const [transactionHash, setTransactionHash] = useState<string>();
@@ -193,6 +194,13 @@ const Modal = () => {
         });
         console.log(transaction);
         setTransactionHash(hash);
+        toast({
+          title: 'Transction completed',
+          description: "Transcation has been successfully completed",
+          status: 'success',
+          duration: 9000,
+          isClosable: true,
+        });
       } else {
         console.log("No Token Address Found");
         return;
@@ -449,8 +457,8 @@ const Modal = () => {
                               Meta Address
                             </p>
                             <p className="text-lg mt-1 text-gray-600">
-                              {stealthMetaAddress.slice(0, 20)}....
-                              {stealthMetaAddress.slice(-15)}
+                              {stealthMetaAddress?.slice(0, 20)}....
+                              {stealthMetaAddress?.slice(-15)}
                             </p>
                           </div>
                           <div className="w-full flex mt-6 justify-between">
@@ -650,9 +658,8 @@ const Modal = () => {
                     {scanData &&
                       scanData.map((data) => {
                         return (
-                          <ul>
+                          <ul key={data.stealthAddress}>
                             <li
-                              key={data.stealthAddress}
                               className={`${
                                 chooseStealthAddress &&
                                 "border-blue-500 cursor-pointer"
@@ -698,14 +705,6 @@ const Modal = () => {
                     >
                       Reveal
                     </button>
-                    {/* <div className="mt-3 flex justify-center text-center mx-auto mb-3">
-                      <p className="text-sm text-gray-500 w-[300px] text-center">
-                        Stealth Private Key
-                      </p>
-                      <p className="text-sm text-gray-500 w-[300px] text-center">
-                        {stealthKey}
-                      </p>
-                    </div> */}
                     <AlertDialog
                       leastDestructiveRef={cancelRef}
                       isOpen={isOpen}
