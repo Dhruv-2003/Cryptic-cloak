@@ -1,66 +1,62 @@
+import { ethers } from "ethers";
+
+const transferABI = [
+    {
+      name: "transfer",
+      type: "function",
+      inputs: [
+        {
+          name: "_to",
+          type: "address",
+        },
+        {
+          type: "uint256",
+          name: "_tokens",
+        },
+      ],
+      constant: false,
+      outputs: [],
+      payable: false,
+    },
+  ];
+
 export async function transferERC20(
-  tokenContract: any, //ERC20_TOKEN_ADDRESS
-  wallet: any,
-  provider: any,
-  toAddress: string,
-  amount: number
+  tokenAddress: any, //ERC20_TOKEN_ADDRESS
+  signer:any,
+  amount: string,
+  Recipient_Wallet_Address: string
 ) {
   try {
-    const gasEstimate = await tokenContract.estimateGas.transfer(
-      toAddress,
-      amount
-    );
+    const token = new ethers.Contract(tokenAddress, transferABI, signer);
+    const amountTransfer = ethers.parseUnits(amount, 18);
+    await token
+      .transfer(Recipient_Wallet_Address, amountTransfer)
+      .then((transferResult: any) => {
+        console.log("transferResult", transferResult);
+      })
+      .catch((error: any) => {
+        console.error("Error", error);
+      });
 
-    const transaction = await tokenContract.populateTransaction.transfer(
-      toAddress,
-      amount,
-      {
-        gasLimit: gasEstimate,
-      },    
-    );
-
-    const signedTransaction = await wallet.signTransaction(transaction);
-
-    const transactionResponse = await provider.sendTransaction(
-      signedTransaction
-    );
-
-    console.log("Transaction Hash:", transactionResponse.hash);
   } catch (error) {
     console.error("Error transferring tokens:", error);
   }
 }
 
-export async function transferNFT(
-    tokenContract: any,
-    wallet: any,
-    provider: any,
-    toAddress: string,
-    amount: number
-  ) {
-    try {
-      const gasEstimate = await tokenContract.estimateGas.transfer(
-        toAddress,
-        amount
-      );
-  
-      const transaction = await tokenContract.populateTransaction.transfer(
-        toAddress,
-        amount,
-        {
-          gasLimit: gasEstimate,
-        },    
-      );
-  
-      const signedTransaction = await wallet.signTransaction(transaction);
-  
-      const transactionResponse = await provider.sendTransaction(
-        signedTransaction
-      );
-  
-      console.log("Transaction Hash:", transactionResponse.hash);
-    } catch (error) {
-      console.error("Error transferring tokens:", error);
-    }
+export const transferNativeToken = async (
+  walletClient: any,
+  account: any,
+  value: number,
+  to: string
+) => {
+  try {
+    const hash = await walletClient.sendTransaction({
+      account: account,
+      to: to,
+      value: value,
+    });
+    console.log(hash);
+  } catch (error) {
+    console.log(error);
   }
-  
+};
