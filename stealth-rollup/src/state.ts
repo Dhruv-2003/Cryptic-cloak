@@ -34,43 +34,50 @@ class AnnouncementTransport {
 }
 
 export interface AnnouncementActionInput {
-  type: "annoucement";
+  type: "announce";
+  stealthAddress: string;
+  ephemeralPublicKey: string;
+  viewTag: number;
 }
 
-export class StealthAnnoucementRollup extends RollupState<
+export class AnnouncementRollup extends RollupState<
   AnnouncementVariable,
   AnnouncementTransport
 > {
-  constructor(count: AnnouncementVariable) {
-    super(count);
+  constructor(initialAnnouncement: AnnouncementVariable) {
+    super(initialAnnouncement);
   }
 
-  createTransport(state: StateVariable): StateTransport {
-    return { currentCount: state };
+  createTransport(state: AnnouncementVariable): AnnouncementTransport {
+    const newTree = new AnnouncementTransport(state);
+    return newTree;
   }
 
-  getState(): StateVariable {
-    return this.transport.currentCount;
+  getState(): AnnouncementVariable {
+    return this.transport.leaves;
   }
 
   calculateRoot(): ethers.BytesLike {
-    return ethers.solidityPackedKeccak256(
-      ["uint256"],
-      [this.transport.currentCount]
-    );
+    return this.transport.merkletree.getHexRoot();
   }
 }
 
-export const counterSTF: STF<CounterRollup, CounterActionInput> = {
-  identifier: "counterSTF",
+export const announcementSTF: STF<AnnouncementRollup, AnnouncementActionInput> =
+  {
+    identifier: "announcementSTF",
 
-  apply(inputs: CounterActionInput, state: CounterRollup): void {
-    let newState = state.getState();
-    if (inputs.type === "increment") {
-      newState += 1;
-    } else if (inputs.type === "decrement") {
-      throw new Error("Not implemented");
-    }
-    state.transport.currentCount = newState;
-  },
-};
+    apply(inputs: AnnouncementActionInput, state: AnnouncementRollup): void {
+      let newState = state.getState();
+      if (inputs.type === "announce") {
+        const newAnnouncement: Annoucement = {
+          stealthAddress: inputs.stealthAddress,
+          ephemeralPublicKey: inputs.ephemeralPublicKey,
+          viewTag: inputs.viewTag,
+        };
+        state.transport.leaves.push(newAnnouncement);
+      } else {
+        throw new Error("Not implemented");
+      }
+      state.transport.leaves = newState;
+    },
+  };
