@@ -19,7 +19,7 @@ const showMetaAddress = (keyfile) => {
 const getMetaAddress = (spendingKey, viewingKey) => {
   //  "stealthereum get-meta-address -s 0x6d2f70a47ddf455feb6a785b9787265f28897546bd1316224300aed627ef8cfc -v 0xa2e9f98f845bb6a8d2db0a2a17a9d185fc97afd1b7949983ee367f9f08a5e0b7"
   const command = `${cliPath} get-meta-address -s ${spendingKey} -v ${viewingKey}`;
-  exectueCommand(command);
+  return exectueCommand(command);
 };
 
 const getStealthAddress = (metaAddress) => {
@@ -31,7 +31,7 @@ const getStealthAddress = (metaAddress) => {
 const revealStealthKey = (keyfile, stealthAddress, ephemeralAddress) => {
   //  "stealthereum reveal-stealth-key -k ./keyfile.json -s 0x4f0ee9771b4cd3e40ee80af8516bed32689ad904 -e 0x023ea3dfbd49d5c147c671173e3287d94caa49aba846cf3a665f5bb625ccb7da19";
   const command = `${cliPath} reveal-stealth-key -k ${keyfile} -s ${stealthAddress} -e ${ephemeralAddress}`;
-  exectueCommand(command);
+  return exectueCommand(command);
 };
 
 const revealStealthKeyNoFile = (
@@ -46,22 +46,32 @@ const revealStealthKeyNoFile = (
 };
 
 const exectueCommand = (command) => {
-  exec(command, (error, stdout, stderr) => {
+  return exec(command, (error, stdout, stderr) => {
     if (error) {
       console.error(`Error executing command: ${error.message}`);
-      return;
+      return error;
     }
 
     if (stderr) {
       console.error(`Error output: ${stderr}`);
-      return;
+      return stderr;
     }
 
     const result = stdout.trim();
     console.log(`Output: ${result}`);
+    return result;
   });
 };
 
+module.exports = {
+  generateKeys,
+  getMetaAddress,
+  getStealthAddress,
+  revealStealthKey,
+  revealStealthKeyNoFile,
+  showMetaAddress,
+  exectueCommand,
+};
 // exec(command, (error, stdout, stderr) => {
 //   if (error) {
 //     console.error(`Error executing command: ${error.message}`);

@@ -33,12 +33,15 @@ class AnnouncementTransport {
   }
 }
 
-export interface CounterActionInput {
-  type: "increment" | "decrement";
+export interface AnnouncementActionInput {
+  type: "annoucement";
 }
 
-export class CounterRollup extends RollupState<StateVariable, StateTransport> {
-  constructor(count: StateVariable) {
+export class StealthAnnoucementRollup extends RollupState<
+  AnnouncementVariable,
+  AnnouncementTransport
+> {
+  constructor(count: AnnouncementVariable) {
     super(count);
   }
 
