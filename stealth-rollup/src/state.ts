@@ -1,11 +1,36 @@
 import { RollupState, STF } from "@stackr/stackr-js/execution";
 import { ethers } from "ethers";
-import MerkleTree from "merkletreejs";
+import { MerkleTree } from "merkletreejs";
 
-export type StateVariable = number;
+export type Annoucement = {
+  stealthAddress: string;
+  ephemeralPublicKey: string;
+  viewTag: number;
+};
 
-interface StateTransport {
-  currentCount: StateVariable;
+export type AnnouncementVariable = Annoucement[];
+
+class AnnouncementTransport {
+  public merkletree: MerkleTree;
+  public leaves: Annoucement[];
+
+  constructor(leaves: Annoucement[]) {
+    this.merkletree = this.createTree(leaves);
+    this.leaves = leaves;
+  }
+
+  createTree(leaves: Annoucement[]) {
+    const hashedLeaves = leaves.map((leaf: Annoucement) => {
+      return ethers.solidityPackedSha256(
+        ["address", "bytes", "uint16"],
+        [leaf.stealthAddress, leaf.ephemeralPublicKey, leaf.viewTag]
+      );
+    });
+
+    return new MerkleTree(hashedLeaves, ethers.solidityPackedSha256, {
+      sort: true,
+    });
+  }
 }
 
 export interface CounterActionInput {
