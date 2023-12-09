@@ -39,7 +39,7 @@ const getStealthAddress = async (
 ): Promise<
   | {
       schemeId: string;
-      stealthAddress: string;
+      stealthAddress: `0x${string}`;
       ephemeralPublicKey: string;
       viewTag: string;
     }

@@ -15,14 +15,22 @@ import {
 import { useState } from "react";
 import { getUserMetadatAddress } from "@/utils/rollupMethods";
 import { getStealthAddress } from "@/utils/stealthMethods";
+import { erc20ABI, useAccount, usePublicClient, useWalletClient } from "wagmi";
+import { parseEther } from "viem";
 
 const Modal = () => {
-  const [receiverAddress, setReceieverAddress] = useState<string>();
+  const { address: account } = useAccount();
+  const publicClient = usePublicClient();
+  const { data: walletClient } = useWalletClient();
+
+  const [receiverAddress, setReceieverAddress] = useState<`0x${string}`>();
   const [stealthMetaAddress, setStealthMetaAddress] = useState<string>();
+  const [tokenAddress, setTokenAddress] = useState<`0x${string}`>();
+  const [amount, setAmount] = useState<string>();
 
   const [stealthAddressData, setStealthAddressData] = useState<{
     schemeId: string;
-    stealthAddress: string;
+    stealthAddress: `0x${string}`;
     ephemeralPublicKey: string;
     viewTag: string;
   }>();
@@ -69,6 +77,85 @@ const Modal = () => {
         return;
       }
       setStealthAddressData(stealthAddressData);
+
+      // await handleStepper();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleTokenTransfer = async () => {
+    try {
+      if (!stealthAddressData) {
+        console.log("No Stealth address found");
+        return;
+      }
+      // transfer the funds to the stealth address
+      if (!walletClient) {
+        console.log("No Wallet Client Found");
+        return;
+      }
+      if (!amount) {
+        console.log("No Wallet Client Found");
+        return;
+      }
+
+      if (tokenAddress == "0xe") {
+        try {
+          const hash = await walletClient.sendTransaction({
+            account: account,
+            //@ts-ignore
+            to: stealthAddressData.stealthAddress,
+            value: parseEther(amount),
+          });
+          console.log(hash);
+          console.log("Transaction Sent");
+          const transaction = await publicClient.waitForTransactionReceipt({
+            hash: hash,
+          });
+          console.log(transaction);
+        } catch (error) {
+          console.log(error);
+        }
+      } else if (tokenAddress != "0xe" && tokenAddress) {
+        // perform token Transfer
+        const data = await publicClient?.simulateContract({
+          account,
+          address: tokenAddress,
+          abi: erc20ABI,
+          functionName: "transfer",
+          args: [stealthAddressData.stealthAddress, parseEther(amount)],
+        });
+        console.log(data);
+        if (!walletClient) {
+          console.log("Wallet client not found");
+          return;
+        }
+        // @ts-ignore
+        const hash = await walletClient.writeContract(data.request);
+        console.log("Transaction Sent");
+        const transaction = await publicClient.waitForTransactionReceipt({
+          hash: hash,
+        });
+        console.log(transaction);
+      } else {
+        console.log("No Token Address Found");
+        return;
+      }
+      // await handleStepper();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleAnnounce = async () => {
+    try {
+      if (!stealthAddressData) {
+        console.log("No Stealth address found");
+        return;
+      }
+
+      // update the Registery contract with the stealth address data
 
       // await handleStepper();
     } catch (error) {
@@ -149,6 +236,7 @@ const Modal = () => {
                         <input
                           className="px-4 mt-2 py-3 border border-gray-100 rounded-xl text-2xl w-full"
                           placeholder="0"
+                          onChange={(e) => setAmount(e.target.value)}
                         ></input>
                       </div>
                       <div className="mt-7 mx-auto">

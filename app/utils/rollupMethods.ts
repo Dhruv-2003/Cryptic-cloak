@@ -64,6 +64,9 @@ const updateAnnouncement = async (
         stealthAddress: stealthAddress,
         ephemeralPublicKey: ephemeralPublicKey,
         viewTag: viewTag,
+        publicAddress: "",
+        stelathMetaAddress: "",
+        schemeId: 0,
       }),
     })
       .then(async (res) => {
@@ -95,6 +98,9 @@ const updateRegister = async (
       },
       body: JSON.stringify({
         type: "register",
+        stealthAddress: "",
+        ephemeralPublicKey: "",
+        viewTag: "",
         publicAddress: publicAddress,
         stelathMetaAddress: stelathMetaAddress,
         schemeId: schemeId,
@@ -119,13 +125,13 @@ const updateRegister = async (
 export { getAnnouncements, getRegisters, updateAnnouncement, updateRegister };
 
 export type Annoucement = {
-  stealthAddress: string;
+  stealthAddress: `0x${string}`;
   ephemeralPublicKey: string;
   viewTag: number;
 };
 
 export type Register = {
-  publicAddress: string;
+  publicAddress: `0x${string}`;
   stelathMetaAddress: string;
   schemeId: number;
 };
@@ -147,7 +153,7 @@ export type Register = {
 // };
 
 const getUserMetadatAddress = async (
-  userAddress: string
+  userAddress: `0x${string}`
 ): Promise<Register | undefined> => {
   try {
     const registerData = await getRegisters();
