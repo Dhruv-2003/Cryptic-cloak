@@ -212,7 +212,7 @@ const Modal = () => {
         stealthAddressData.viewTag
       );
 
-      // await handleStepper();
+      await handleStepper();
     } catch (error) {
       console.log(error);
     }
@@ -503,7 +503,7 @@ const Modal = () => {
                       <div className="mt-5 flex flex-col"></div>
                       <div className="mt-2 mx-auto">
                         <button
-                          onClick={() => handleStepper()}
+                          onClick={() => handleAnnounce()}
                           className="px-6 mx-auto flex justify-center py-2 bg-blue-500 text-white text-xl rounded-xl font-semibold border hover:scale-105 hover:bg-white hover:border-blue-500 hover:text-blue-500 duration-200"
                         >
                           Announce Stealth Address
