@@ -6,6 +6,7 @@ import sha256 from "sha256";
 import { privateKeyToAccount } from "viem/accounts";
 import { useNetwork } from "wagmi";
 import { updateAnnouncement, updateRegister } from "@/utils/rollupMethods";
+import { getStealthMetaAddress } from "@/utils/stealthMethods";
 
 const Navbar = () => {
   const { address: account } = useAccount();
@@ -13,6 +14,8 @@ const Navbar = () => {
   const { data: walletClient } = useWalletClient();
   const [spendingKey, setSpendingKey] = useState<string>();
   const [viewingKey, setViewingKey] = useState<string>();
+  const [userAddress, setUserAddress] = useState<string>();
+  const [stealthMetaAddress, setStealthMetaAddress] = useState<string>();
 
   const signAndGenerateKey = async () => {
     try {
@@ -33,6 +36,7 @@ const Navbar = () => {
       const newAccount = privateKeyToAccount(`0x${privateKey}`);
       console.log(newAccount);
 
+      setUserAddress(newAccount.address);
       setSpendingKey(`0x${privateKey}`);
       setViewingKey(`0x${privateKey}`);
     } catch (error) {
@@ -40,19 +44,30 @@ const Navbar = () => {
     }
   };
 
+  const getMetaAddress = async () => {
+    try {
+      if (!spendingKey || !viewingKey) {
+        console.log("Please sign and generate keys");
+        return;
+      }
+
+      const metaAddress = await getStealthMetaAddress(spendingKey, viewingKey);
+      console.log(metaAddress);
+      if (metaAddress) {
+        setStealthMetaAddress(metaAddress);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const registerMetaAddress = async () => {
     try {
-      // await updateRegister(
-      //   "0xCB5160610F4655B938eE67729fD542AFb5d1586F",
-      //   "0x025227b7d6a0163ac13dc25854c8da65ea84a3994e3b0fb56debebac4e75ba2d7e025227b7d6a0163ac13dc25854c8da65ea84a3994e3b0fb56debebac4e75ba2d7e",
-      //   0
-      // );
-
-      await updateAnnouncement(
-        "0xf056c1bbf293799910ac551f405ac91e28e1d831",
-        "0x0397fce4b5618ea3c2f125b44e04d708b3318b9e3df4fb733d0002d105288fd54b",
-        237
-      );
+      if (!userAddress || !stealthMetaAddress) {
+        console.log("Please sign and generate keys , or get meta address");
+        return;
+      }
+      await updateRegister(userAddress, stealthMetaAddress, 0);
     } catch (error) {
       console.log(error);
     }
@@ -65,10 +80,10 @@ const Navbar = () => {
           <p className="font-semibold text-2xl">ProjectName</p>
         </div>
         <div className="flex">
-          <select className="bg-white border border-blue-500 rounded-xl px-2 py-1 text-lg text-blue-500 font-semibold">
+          {/* <select className="bg-white border border-blue-500 rounded-xl px-2 py-1 text-lg text-blue-500 font-semibold">
             <option value="1">usdt</option>
             <option value="2">usdc</option>
-          </select>
+          </select> */}
           <button
             onClick={() => registerMetaAddress()}
             className="bg-white mx-3 border border-blue-500 rounded-xl px-6 py-1 text-lg text-blue-500 font-semibold"
