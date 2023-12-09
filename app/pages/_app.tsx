@@ -3,17 +3,39 @@ import type { AppProps } from "next/app";
 import "@rainbow-me/rainbowkit/styles.css";
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
-import { polygonMumbai, polygonZkEvmTestnet, arbitrumSepolia,arbitrumGoerli, scrollSepolia, scrollTestnet, mantleTestnet, celoAlfajores, baseGoerli, baseSepolia, xdcTestnet, lineaTestnet } from "wagmi/chains";
-import { alchemyProvider } from "wagmi/providers/alchemy";
+import {
+  polygonMumbai,
+  polygonZkEvmTestnet,
+  arbitrumSepolia,
+  arbitrumGoerli,
+  scrollSepolia,
+  scrollTestnet,
+  mantleTestnet,
+  celoAlfajores,
+  baseGoerli,
+  baseSepolia,
+  xdcTestnet,
+  lineaTestnet,
+} from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 import { ChakraProvider } from "@chakra-ui/react";
 
 const { chains, publicClient } = configureChains(
-  [polygonMumbai, polygonZkEvmTestnet, arbitrumSepolia,arbitrumGoerli, scrollSepolia, scrollTestnet, mantleTestnet, celoAlfajores, baseGoerli, baseSepolia, xdcTestnet, lineaTestnet],
   [
-    alchemyProvider({ apiKey: process.env.ALCHEMY_ID as string }),
-    publicProvider(),
-  ]
+    polygonMumbai,
+    polygonZkEvmTestnet,
+    arbitrumSepolia,
+    arbitrumGoerli,
+    scrollSepolia,
+    scrollTestnet,
+    mantleTestnet,
+    celoAlfajores,
+    baseGoerli,
+    baseSepolia,
+    xdcTestnet,
+    lineaTestnet,
+  ],
+  [publicProvider()]
 );
 
 const { connectors } = getDefaultWallets({
