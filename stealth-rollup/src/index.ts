@@ -11,8 +11,22 @@ import * as genesisState from "../genesis-state.json";
 const rollup = async () => {
   const counterFsm = new StateMachine({
     state: new AnnouncementRollup({
-      announcements: [],
-      registers: [],
+      announcements: [
+        {
+          stealthAddress: "0x084c53dad73b23f7d709fdcc2edbe5caa44bccce",
+          ephemeralPublicKey:
+            "0x0391e14240e98bc771f00b5ad49f3f7ec92fd498e43f04708fd61f02fddc0931f2",
+          viewTag: 33,
+        },
+      ],
+      registers: [
+        {
+          publicAddress: "0x084c53dad73b23f7d709fdcc2edbe5caa44bccce",
+          stelathMetaAddress:
+            "0x02f868433a12a9d57e355176a00ee6b5c80ed1fe2c939d81062e0251081994f039022290fba566a42824f283e54582fc4fefb0767f04551c748aa8bd8b66bef677cf",
+          schemeId: 0,
+        },
+      ],
     }),
     stf: announcementSTF,
   });
@@ -83,8 +97,8 @@ app.post("/update", async (req: Request, res: Response) => {
   }
 });
 
-app.listen(8080, () => {
-  console.log("listening on port 8080");
+app.listen(8000, () => {
+  console.log("listening on port 8000");
 });
 
 // actionEventsEmitter.on(ActionEvents.SUBMIT_ACTION, (data) => {

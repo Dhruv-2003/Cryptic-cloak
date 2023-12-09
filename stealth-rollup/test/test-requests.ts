@@ -55,7 +55,7 @@ const run = async () => {
   const start = Date.now();
   const payload = await getData();
 
-  const res = await fetch("http://localhost:8080/", {
+  const res = await fetch("http://localhost:8000/", {
     method: "POST",
     body: payload,
     headers: {

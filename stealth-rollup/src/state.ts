@@ -96,7 +96,7 @@ export class AnnouncementRollup extends RollupState<
       state.announcements,
       state.registers
     );
-    console.log(newTree);
+    // console.log(newTree);
     return newTree;
   }
 
@@ -112,7 +112,7 @@ export class AnnouncementRollup extends RollupState<
       .getHexRoot()
       .concat(this.transport.merkletreeRegister.getHexRoot());
 
-    console.log(finalRoot);
+    // console.log(finalRoot);
     return finalRoot;
   }
 }

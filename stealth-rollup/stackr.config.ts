@@ -6,8 +6,8 @@ import * as deployment from "./deployment.json";
 
 const stackrConfig: StackrConfig = {
   stackrApp: {
-    appId: 56,
-    appInbox: "0xe5c2de6ebf81659db5de38ee9176951e7a248858",
+    appId: 88,
+    appInbox: "0x5eb23a56b604ba226ced7b4ea074498c8622748c",
   },
   builder: {
     batchSize: 16,
