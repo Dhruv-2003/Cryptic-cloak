@@ -1,28 +1,9 @@
+import { transferABI } from "@/constants/ERC20";
 import { ethers } from "ethers";
-
-const transferABI = [
-    {
-      name: "transfer",
-      type: "function",
-      inputs: [
-        {
-          name: "_to",
-          type: "address",
-        },
-        {
-          type: "uint256",
-          name: "_tokens",
-        },
-      ],
-      constant: false,
-      outputs: [],
-      payable: false,
-    },
-  ];
 
 export async function transferERC20(
   tokenAddress: any, //ERC20_TOKEN_ADDRESS
-  signer:any,
+  signer: any,
   amount: string,
   Recipient_Wallet_Address: string
 ) {
@@ -37,7 +18,6 @@ export async function transferERC20(
       .catch((error: any) => {
         console.error("Error", error);
       });
-
   } catch (error) {
     console.error("Error transferring tokens:", error);
   }
