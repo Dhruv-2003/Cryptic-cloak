@@ -451,6 +451,14 @@ const Modal = () => {
                     <div>
                       {!checkTokenTransfer && (
                         <div className="flex flex-col">
+                          <div className="mt-4 flex flex-col">
+                            <p className="text-md text-gray-600">
+                              Sending Funds from
+                            </p>
+                            <p className="text-lg mt-1 text-gray-600">
+                              {chooseStealthAddress}
+                            </p>
+                          </div>
                           <div className="mt-5 flex flex-col">
                             <p className="text-md text-gray-600">amount</p>
                             <div className="flex w-full items-center">
