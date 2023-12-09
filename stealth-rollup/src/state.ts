@@ -36,6 +36,7 @@ class AnnouncementTransport {
       announcements,
       registers
     );
+
     this.merkletreeAnnouncement = merkletreeAnnouncement;
     this.merkletreeRegister = merkletreeRegister;
 
@@ -46,21 +47,27 @@ class AnnouncementTransport {
   createTree(announcements: Annoucement[], registers: Register[]) {
     const hashedLeavesAnnouncement = announcements.map((leaf: Annoucement) => {
       return ethers.solidityPackedKeccak256(
-        ["address", "bytes33", "uint16"],
+        ["address", "bytes", "uint"],
         [leaf.stealthAddress, leaf.ephemeralPublicKey, leaf.viewTag]
       );
     });
 
-    let merkletreeAnnouncement = new MerkleTree(hashedLeavesAnnouncement);
+    let merkletreeAnnouncement = new MerkleTree(
+      hashedLeavesAnnouncement,
+      ethers.solidityPackedKeccak256
+    );
 
     const hashedLeavesRegister = registers.map((leaf: Register) => {
       return ethers.solidityPackedKeccak256(
-        ["address", "bytes66", "uint16"],
+        ["address", "bytes", "uint"],
         [leaf.publicAddress, leaf.stelathMetaAddress, leaf.schemeId]
       );
     });
 
-    let merkletreeRegister = new MerkleTree(hashedLeavesRegister);
+    let merkletreeRegister = new MerkleTree(
+      hashedLeavesRegister,
+      ethers.solidityPackedKeccak256
+    );
 
     return { merkletreeAnnouncement, merkletreeRegister };
   }
@@ -85,11 +92,11 @@ export class AnnouncementRollup extends RollupState<
   }
 
   createTransport(state: AnnouncementVariable): AnnouncementTransport {
-    console.log(state);
     const newTree = new AnnouncementTransport(
       state.announcements,
       state.registers
     );
+    console.log(newTree);
     return newTree;
   }
 
@@ -101,9 +108,12 @@ export class AnnouncementRollup extends RollupState<
   }
 
   calculateRoot(): ethers.BytesLike {
-    return this.transport.merkletreeAnnouncement
+    const finalRoot = this.transport.merkletreeAnnouncement
       .getHexRoot()
       .concat(this.transport.merkletreeRegister.getHexRoot());
+
+    console.log(finalRoot);
+    return finalRoot;
   }
 }
 

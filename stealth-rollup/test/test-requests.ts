@@ -23,7 +23,7 @@ const getData = async () => {
   const wallet = ethers.Wallet.createRandom();
 
   const AnnounceData: AnnouncementActionInput = {
-    type: "register",
+    type: "announce",
     stealthAddress: "0x084c53dad73b23f7d709fdcc2edbe5caa44bccce",
     ephemeralPublicKey:
       "0x0391e14240e98bc771f00b5ad49f3f7ec92fd498e43f04708fd61f02fddc0931f2",

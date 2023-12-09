@@ -59,7 +59,7 @@ app.use(bodyParser.json());
 const { actions, state } = await rollup();
 
 app.get("/", (req: Request, res: Response) => {
-  res.send({ currentAnnouncement: state.get().state.getState() });
+  res.send({ currentAnnouncement: state.get().state.getState().announcements });
 });
 
 app.post("/", async (req: Request, res: Response) => {
