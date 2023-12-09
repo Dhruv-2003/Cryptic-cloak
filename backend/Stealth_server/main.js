@@ -35,9 +35,13 @@ const getStealthAddress = async (metaAddress) => {
   return result;
 };
 
-const revealStealthKey = async (keyfile, stealthAddress, ephemeralAddress) => {
+const revealStealthKey = async (
+  keyfile,
+  stealthAddress,
+  ephemeralPublicKey
+) => {
   //  "stealthereum reveal-stealth-key -k ./keyfile.json -s 0x4f0ee9771b4cd3e40ee80af8516bed32689ad904 -e 0x023ea3dfbd49d5c147c671173e3287d94caa49aba846cf3a665f5bb625ccb7da19";
-  const command = `${cliPath} reveal-stealth-key -k ${keyfile} -s ${stealthAddress} -e ${ephemeralAddress}`;
+  const command = `${cliPath} reveal-stealth-key -k ${keyfile} -s ${stealthAddress} -e ${ephemeralPublicKey}`;
   const result = await exectueCommandAsync(command);
   return result;
 };
@@ -46,10 +50,10 @@ const revealStealthKeyNoFile = async (
   spendingKey,
   viewingKey,
   stealthAddress,
-  ephemeralAddress
+  ephemeralPublicKey
 ) => {
   //  "stealthereum reveal-stealth-key -k ./keyfile.json -s 0x4f0ee9771b4cd3e40ee80af8516bed32689ad904 -e 0x023ea3dfbd49d5c147c671173e3287d94caa49aba846cf3a665f5bb625ccb7da19";
-  const command = `${cliPath} reveal-stealth-key-no-file --spendingkey ${spendingKey} --viewingkey ${viewingKey} --stealthaddr ${stealthAddress} --ephemeralpub ${ephemeralAddress}`;
+  const command = `${cliPath} reveal-stealth-key-no-file --spendingkey ${spendingKey} --viewingkey ${viewingKey} --stealthaddr ${stealthAddress} --ephemeralpub ${ephemeralPublicKey}`;
   const result = await exectueCommandAsync(command);
   return result;
 };

@@ -5,6 +5,7 @@ const {
   getMetaAddress,
   getStealthAddress,
   revealStealthKey,
+  revealStealthKeyNoFile,
 } = require("./main.js");
 const app = express();
 var cors = require("cors");
@@ -46,15 +47,15 @@ app.post("/getStealthAddress", async (req, res) => {
 
 app.post("/revealStealthKeyNoFile", async (req, res) => {
   console.log(req.body);
-  const { spendingKey, viewingKey, stealthAddress, ephemeralAddress } =
+  const { spendingKey, viewingKey, stealthAddress, ephemeralPublicKey } =
     req.body;
 
   try {
-    const data = await revealStealthKey(
+    const data = await revealStealthKeyNoFile(
       spendingKey,
       viewingKey,
       stealthAddress,
-      ephemeralAddress
+      ephemeralPublicKey
     );
     console.log(data);
     res.status(201).send({ data });
