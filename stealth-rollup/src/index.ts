@@ -58,11 +58,15 @@ const app = express();
 app.use(bodyParser.json());
 const { actions, state } = await rollup();
 
-app.get("/", (req: Request, res: Response) => {
-  res.send({ currentAnnouncement: state.get().state.getState() });
+app.get("/announcements", (req: Request, res: Response) => {
+  res.send({ currentAnnouncement: state.get().state.getState().announcements});
 });
 
-app.post("/", async (req: Request, res: Response) => {
+app.get("/registers", (req: Request, res: Response) => {
+  res.send({ currentRegistry: state.get().state.getState().registers });
+});
+
+app.post("/update", async (req: Request, res: Response) => {
   const schema = actions.getSchema("update-announcement");
 
   if (!schema) {
