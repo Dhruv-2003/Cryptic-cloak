@@ -6,8 +6,8 @@ import * as deployment from "./deployment.json";
 
 const stackrConfig: StackrConfig = {
   stackrApp: {
-    appId: 88,
-    appInbox: "0x5eb23a56b604ba226ced7b4ea074498c8622748c",
+    appId: 112,
+    appInbox: "0x778855a567ba97db108d84e9c88e02ec676fc444",
   },
   builder: {
     batchSize: 16,
@@ -32,7 +32,7 @@ const stackrConfig: StackrConfig = {
     name: "Stackr MVP v0",
     version: "1",
     chainId: 69420,
-    verifyingContract: "0xe5c2de6ebf81659db5de38ee9176951e7a248858",
+    verifyingContract: "0x778855a567ba97db108d84e9c88e02ec676fc444",
     salt: "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
   },
   datastore: {

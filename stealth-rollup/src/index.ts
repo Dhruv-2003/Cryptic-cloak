@@ -34,11 +34,11 @@ const rollup = async () => {
   const actionSchemaType = {
     type: "String",
     stealthAddress: "String",
-    ephemeralPublicKey: "String",
-    viewTag: "Number",
+    ephemeralPublicKey: "Bytes",
+    viewTag: "Uint",
     publicAddress: "String",
-    stelathMetaAddress: "String",
-    schemeId: "Number",
+    stelathMetaAddress: "Bytes",
+    schemeId: "Uint",
   };
 
   const actionInput = new ActionSchema("update-announcement", actionSchemaType);
@@ -71,6 +71,8 @@ const rollup = async () => {
 const app = express();
 app.use(bodyParser.json());
 const { actions, state } = await rollup();
+var cors = require("cors");
+app.use(cors());
 
 app.get("/announcements", (req: Request, res: Response) => {
   res.send({ currentAnnouncement: state.get().state.getState().announcements });

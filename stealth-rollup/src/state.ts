@@ -132,34 +132,32 @@ export const announcementSTF: STF<AnnouncementRollup, AnnouncementActionInput> =
 
     apply(inputs: AnnouncementActionInput, state: AnnouncementRollup): void {
       let newState = state.getState();
-      console.log(newState);
-      // if (inputs.type === "announce") {
-      //   const newAnnouncement: Annoucement = {
-      //     stealthAddress: inputs.stealthAddress,
-      //     ephemeralPublicKey: inputs.ephemeralPublicKey,
-      //     viewTag: inputs.viewTag,
-      //   };
-      //   console.log(newAnnouncement);
-      //   newState.announcements.push(newAnnouncement);
-      //   console.log(newState);
-      // } else if (inputs.type === "register") {
-      //   const newRegister: Register = {
-      //     publicAddress: inputs.publicAddress,
-      //     stelathMetaAddress: inputs.stelathMetaAddress,
-      //     schemeId: inputs.schemeId,
-      //   };
-      //   console.log(newRegister);
-      //   newState.registers.push(newRegister);
-      //   console.log(newState);
-      //   // const arrays = newState.registers;
-      //   // arrays.findIndex((element) => element.publicAddress === inputs.publicAddress);
-      // } else {
-      //   throw new Error("Not implemented");
-      // }
+      // console.log(newState);
+      if (inputs.type === "announce") {
+        const newAnnouncement: Annoucement = {
+          stealthAddress: inputs.stealthAddress,
+          ephemeralPublicKey: inputs.ephemeralPublicKey,
+          viewTag: inputs.viewTag,
+        };
+        console.log(newAnnouncement);
+        newState.announcements.push(newAnnouncement);
+        console.log(newState);
+      } else if (inputs.type === "register") {
+        const newRegister: Register = {
+          publicAddress: inputs.publicAddress,
+          stelathMetaAddress: inputs.stelathMetaAddress,
+          schemeId: inputs.schemeId,
+        };
+        console.log(newRegister);
+        newState.registers.push(newRegister);
+        console.log(newState);
+        // const arrays = newState.registers;
+        // arrays.findIndex((element) => element.publicAddress === inputs.publicAddress);
+      } else {
+        throw new Error("Not implemented");
+      }
 
-      // state.transport.announcementLeaves = newState.announcements;
-      // state.transport.registerLeaves = newState.registers;
-      state.transport.announcementLeaves = [];
-      state.transport.registerLeaves = [];
+      state.transport.announcementLeaves = newState.announcements;
+      state.transport.registerLeaves = newState.registers;
     },
   };

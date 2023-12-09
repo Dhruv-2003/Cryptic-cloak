@@ -13,8 +13,20 @@ import {
   useSteps,
 } from "@chakra-ui/react";
 import { useState } from "react";
+import { getUserMetadatAddress } from "@/utils/rollupMethods";
+import { getStealthAddress } from "@/utils/stealthMethods";
 
 const Modal = () => {
+  const [receiverAddress, setReceieverAddress] = useState<string>();
+  const [stealthMetaAddress, setStealthMetaAddress] = useState<string>();
+
+  const [stealthAddressData, setStealthAddressData] = useState<{
+    schemeId: string;
+    stealthAddress: string;
+    ephemeralPublicKey: string;
+    viewTag: string;
+  }>();
+
   const steps = [
     { title: "Generation", description: "Stealth Address" },
     { title: "Transfer", description: "Transfer funds" },
@@ -33,6 +45,34 @@ const Modal = () => {
       if (activeStep < steps.length) {
         setActiveStep(activeStep + 1);
       }
+    }
+  };
+
+  const handleGetReceiverData = async () => {
+    try {
+      if (!receiverAddress) {
+        console.log("No Receiver Address Found");
+        return;
+      }
+      const userMetadata = await getUserMetadatAddress(receiverAddress);
+      console.log(userMetadata);
+      if (!userMetadata) {
+        console.log("No Metadata address found");
+        return;
+      }
+      setStealthMetaAddress(userMetadata.stelathMetaAddress);
+      const stealthAddressData = await getStealthAddress(
+        userMetadata.stelathMetaAddress
+      );
+      if (!stealthAddressData) {
+        console.log("No Stealth address found");
+        return;
+      }
+      setStealthAddressData(stealthAddressData);
+
+      // await handleStepper();
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -80,13 +120,15 @@ const Modal = () => {
                           address of receiver
                         </p>
                         <input
+                          type="text"
                           className="px-4 mt-2 py-3 border border-gray-100 rounded-xl w-full"
                           placeholder="Enter address of receiver"
+                          onChange={(e) => setReceieverAddress(e.target.value)}
                         ></input>
                       </div>
                       <div className="mt-7 mx-auto">
                         <button
-                          onClick={() => handleStepper()}
+                          onClick={() => handleGetReceiverData()}
                           className="px-6 mx-auto flex justify-center py-2 bg-blue-500 text-white text-xl rounded-xl font-semibold border hover:scale-105 hover:bg-white hover:border-blue-500 hover:text-blue-500 duration-200"
                         >
                           Generate Stealth for Receiver
@@ -127,8 +169,7 @@ const Modal = () => {
                   )}
                   {activeStep == 2 && (
                     <div>
-                      <div className="mt-5 flex flex-col">
-                      </div>
+                      <div className="mt-5 flex flex-col"></div>
                       <div className="mt-2 mx-auto">
                         <button
                           onClick={() => handleStepper()}

@@ -1,4 +1,4 @@
-const getAnnouncements = async () => {
+const getAnnouncements = async (): Promise<Annoucement[] | undefined> => {
   try {
     const res = await fetch("http://localhost:8080/announcements", {
       method: "GET",
@@ -16,13 +16,14 @@ const getAnnouncements = async () => {
         console.log(err);
       });
 
-    console.log(res);
+    console.log(res.currentAnnouncement);
+    return res.currentAnnouncement;
   } catch (error) {
     console.log(error);
   }
 };
 
-const getRegisters = async () => {
+const getRegisters = async (): Promise<Register[] | undefined> => {
   try {
     const res = await fetch("http://localhost:8080/registers", {
       method: "GET",
@@ -34,13 +35,14 @@ const getRegisters = async () => {
         console.log(res);
         const data = await res.json();
         console.log(data);
-        return res;
+        return data;
       })
       .catch((err) => {
         console.log(err);
       });
 
-    console.log(res);
+    console.log(res.currentRegistry);
+    return res.currentRegistry;
   } catch (error) {
     console.log(error);
   }
@@ -115,3 +117,52 @@ const updateRegister = async (
 };
 
 export { getAnnouncements, getRegisters, updateAnnouncement, updateRegister };
+
+export type Annoucement = {
+  stealthAddress: string;
+  ephemeralPublicKey: string;
+  viewTag: number;
+};
+
+export type Register = {
+  publicAddress: string;
+  stelathMetaAddress: string;
+  schemeId: number;
+};
+
+// const scanAnnouncemets = async (
+//   spendingKey: string,
+//   viewingKey: string
+// ): Promise<Register | undefined> => {
+//   try {
+//     const announcementData = await getAnnouncements();
+//     if (!announcementData) {
+//       return;
+//     }
+//     // announcementData[0].
+//     // find the object which has the userAddress as publicAddress
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
+
+const getUserMetadatAddress = async (
+  userAddress: string
+): Promise<Register | undefined> => {
+  try {
+    const registerData = await getRegisters();
+    if (!registerData) {
+      return;
+    }
+    // find the object which has the userAddress as publicAddress
+    const userMetadataObject = registerData.find(
+      (object: Register) => object.publicAddress === userAddress
+    );
+
+    return userMetadataObject;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export { getUserMetadatAddress };
