@@ -46,7 +46,7 @@ const revealStealthKeyNoFile = (
 };
 
 const exectueCommand = (command) => {
-  return exec(command, (error, stdout, stderr) => {
+  exec(command, (error, stdout, stderr) => {
     if (error) {
       console.error(`Error executing command: ${error.message}`);
       return error;

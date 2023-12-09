@@ -20,7 +20,8 @@ export default function Home() {
       })
         .then(async (res) => {
           console.log(res);
-          console.log(await res.json());
+          const data = await res.json();
+          console.log(data.stdout.trim());
           return res;
         })
         .catch((err) => {
