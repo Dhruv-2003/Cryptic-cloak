@@ -75,7 +75,7 @@ app.post("/update", async (req: Request, res: Response) => {
   }
 
   try {
-    const newAction = schema.newAction(req.body);
+    const newAction = await schema.newAction(req.body);
     const ack = await actions.submit(newAction);
     res.status(201).send({ ack });
   } catch (e: any) {
