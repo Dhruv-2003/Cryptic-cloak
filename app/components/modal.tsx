@@ -28,12 +28,15 @@ const Modal = () => {
   const [tokenAddress, setTokenAddress] = useState<`0x${string}`>();
   const [amount, setAmount] = useState<string>();
   const [checkReceiverData, setCheckReceiverData] = useState<boolean>(false);
+  const [checkTokenTransfer, setCheckTokenTransfer] = useState<boolean>(true);
   const [stealthAddressData, setStealthAddressData] = useState<{
     schemeId: string;
     stealthAddress: `0x${string}`;
     ephemeralPublicKey: string;
     viewTag: string;
   }>();
+  const [page, setPage] = useState<number>(0);
+  const [transactionHash, setTransactionHash] = useState<string>();
 
   const steps = [
     { title: "Generation", description: "Stealth Address" },
@@ -79,7 +82,6 @@ const Modal = () => {
       setStealthAddressData(stealthAddressData);
       if (stealthAddressData) {
         await setCheckReceiverData(true);
-        await handleStepper();
       }
     } catch (error) {
       console.log(error);
@@ -140,11 +142,13 @@ const Modal = () => {
           hash: hash,
         });
         console.log(transaction);
+        setTransactionHash(transaction.transactionHash);
       } else {
         console.log("No Token Address Found");
         return;
       }
-      await handleStepper();
+      // await handleStepper();
+      setCheckTokenTransfer(true);
     } catch (error) {
       console.log(error);
     }
@@ -202,7 +206,7 @@ const Modal = () => {
                     ))}
                   </Stepper>
                   <div className="mt-5 flex flex-col"></div>
-                  {activeStep == 0 && (
+                  {activeStep == 0 && page == 0 && (
                     <div>
                       {!checkReceiverData && (
                         <div className="flex flex-col">
@@ -236,34 +240,124 @@ const Modal = () => {
                         </div>
                       )}
                       {checkReceiverData && (
-                        <div className="flex flex-col"></div>
+                        <div className="flex flex-col">
+                          <div className="mt-1 flex flex-col">
+                            <p className="text-lg text-center text-blue-600">
+                              Addresses Generated
+                            </p>
+                          </div>
+                          <div className="mt-4 flex flex-col">
+                            <p className="text-md text-gray-600">
+                              Stealth Address
+                            </p>
+                            <p className="text-lg mt-1 text-gray-600">
+                              {stealthAddressData?.stealthAddress}
+                            </p>
+                          </div>
+                          <div className="mt-4 flex flex-col">
+                            <p className="text-md text-gray-600">
+                              Ephemeral Public Key
+                            </p>
+                            <p className="text-lg mt-1 text-gray-600">
+                              {stealthAddressData?.ephemeralPublicKey}
+                            </p>
+                          </div>
+                          <div className="mt-4 flex flex-col">
+                            <p className="text-md text-gray-600">View Tag</p>
+                            <p className="text-lg mt-1 text-gray-600">
+                              {stealthAddressData?.viewTag}
+                            </p>
+                          </div>
+                          <div className="mt-4 flex flex-col">
+                            <p className="text-md text-gray-600">
+                              Meta Address
+                            </p>
+                            <p className="text-lg mt-1 text-gray-600">
+                              {stealthMetaAddress}
+                            </p>
+                          </div>
+                          <div className="w-full flex mt-6 justify-between">
+                            <button className=""></button>
+                            <button
+                              onClick={() => {
+                                setPage((currPage) => currPage + 1);
+                                setActiveStep(activeStep + 1);
+                              }}
+                              className="bg-white border border-blue-500 rounded-xl px-7 py-1 text-lg text-blue-500 font-semibold"
+                            >
+                              Next
+                            </button>
+                          </div>
+                        </div>
                       )}
                     </div>
                   )}
-                  {activeStep == 1 && (
+                  {activeStep == 1 && page == 1 && (
                     <div>
-                      <div className="mt-5 flex flex-col">
-                        <p className="text-md text-gray-600">amount</p>
-                        <input
-                          className="px-4 mt-2 py-3 border border-gray-100 rounded-xl text-2xl w-full"
-                          placeholder="0"
-                          onChange={(e) => setAmount(e.target.value)}
-                        ></input>
-                      </div>
-                      <div className="mt-7 mx-auto">
-                        <button
-                          onClick={() => handleStepper()}
-                          className="px-6 mx-auto flex justify-center py-2 bg-blue-500 text-white text-xl rounded-xl font-semibold border hover:scale-105 hover:bg-white hover:border-blue-500 hover:text-blue-500 duration-200"
-                        >
-                          Transfer Funds
-                        </button>
-                      </div>
-                      <div className="mt-3 flex justify-center text-center mx-auto mb-3">
-                        <p className="text-sm text-gray-500 w-2/3 text-center">
-                          The identity of the receiver will be masked using the
-                          stealth address
-                        </p>
-                      </div>
+                      {!checkTokenTransfer && (
+                        <div className="flex flex-col">
+                          <div className="mt-5 flex flex-col">
+                            <p className="text-md text-gray-600">amount</p>
+                            <input
+                              className="px-4 mt-2 py-3 border border-gray-100 rounded-xl text-2xl w-full"
+                              placeholder="0"
+                              onChange={(e) => setAmount(e.target.value)}
+                            ></input>
+                          </div>
+                          <div className="mt-7 mx-auto">
+                            <button
+                              onClick={() => handleTokenTransfer()}
+                              className="px-6 mx-auto flex justify-center py-2 bg-blue-500 text-white text-xl rounded-xl font-semibold border hover:scale-105 hover:bg-white hover:border-blue-500 hover:text-blue-500 duration-200"
+                            >
+                              Transfer Funds
+                            </button>
+                          </div>
+                          <div className="mt-3 flex justify-center text-center mx-auto mb-3">
+                            <p className="text-sm text-gray-500 w-2/3 text-center">
+                              The identity of the receiver will be masked using
+                              the stealth address
+                            </p>
+                          </div>
+                        </div>
+                      )}{" "}
+                      {checkTokenTransfer && (
+                        <div className="flex flex-col">
+                          <div className="mt-1 flex flex-col">
+                            <p className="text-lg text-center text-blue-600">
+                              Token Transfered
+                            </p>
+                          </div>
+                          <div className="mt-4 flex flex-col">
+                            <p className="text-md text-gray-600">
+                              Transaction hash
+                            </p>
+                            <p className="text-lg mt-1 text-gray-600">
+                              {transactionHash}
+                            </p>
+                          </div>
+                          <div className="w-full flex mt-6 justify-between">
+                            <button
+                              onClick={() => {
+                                setPage((currPage) => currPage - 1);
+                                setActiveStep(activeStep - 1);
+                                setStealthAddressData(null);
+                              }}
+                              className="bg-white border border-blue-500 rounded-xl px-7 py-1 text-lg text-blue-500 font-semibold"
+                            >
+                              Prev
+                            </button>
+                            <button
+                              onClick={() => {
+                                setPage((currPage) => currPage + 1);
+                                setActiveStep(activeStep + 1);
+                              }}
+                              className="bg-white border border-blue-500 rounded-xl px-7 py-1 text-lg text-blue-500 font-semibold"
+                            >
+                              Next
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                   {activeStep == 2 && (
@@ -322,8 +416,8 @@ const Modal = () => {
               <TabPanel>
                 <div className="flex flex-col w-[460px] px-6 py-2 bg-white rounded-xl mt-6">
                   <p className="text-lg text-center text-gray-600">
-                    Make your first Transfer or Withdrawal to create
-                    your History.
+                    Make your first Transfer or Withdrawal to create your
+                    History.
                   </p>
                 </div>
               </TabPanel>
