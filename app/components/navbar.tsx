@@ -13,7 +13,6 @@ const Navbar = () => {
   const { data: walletClient } = useWalletClient();
   const [spendingKey, setSpendingKey] = useState<string>();
   const [viewingKey, setViewingKey] = useState<string>();
-  const { chain, chains } = useNetwork();
 
   const signAndGenerateKey = async () => {
     try {
