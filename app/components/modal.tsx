@@ -13,7 +13,10 @@ import {
   useSteps,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { getUserMetadatAddress } from "@/utils/rollupMethods";
+import {
+  getUserMetadatAddress,
+  updateAnnouncement,
+} from "@/utils/rollupMethods";
 import { getStealthAddress } from "@/utils/stealthMethods";
 import { erc20ABI, useAccount, usePublicClient, useWalletClient } from "wagmi";
 import { parseEther } from "viem";
@@ -32,7 +35,7 @@ const Modal = () => {
     schemeId: string;
     stealthAddress: `0x${string}`;
     ephemeralPublicKey: string;
-    viewTag: string;
+    viewTag: number;
   }>();
 
   const steps = [
@@ -158,12 +161,19 @@ const Modal = () => {
       }
 
       // update the Registery contract with the stealth address data
+      await updateAnnouncement(
+        stealthAddressData.stealthAddress,
+        stealthAddressData.ephemeralPublicKey,
+        stealthAddressData.viewTag
+      );
 
       // await handleStepper();
     } catch (error) {
       console.log(error);
     }
   };
+
+  // scan for the user's ephemeral public key set
 
   return (
     <div className="w-screen bg-gradient-to-r from-white via-blue-100 to-rose-200">
@@ -322,8 +332,8 @@ const Modal = () => {
               <TabPanel>
                 <div className="flex flex-col w-[460px] px-6 py-2 bg-white rounded-xl mt-6">
                   <p className="text-lg text-center text-gray-600">
-                    Make your first Transfer or Withdrawal to create
-                    your History.
+                    Make your first Transfer or Withdrawal to create your
+                    History.
                   </p>
                 </div>
               </TabPanel>

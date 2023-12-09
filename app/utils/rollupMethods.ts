@@ -1,5 +1,6 @@
 import { Domain } from "domain";
 import { getAccount, getWalletClient } from "wagmi/actions";
+import { checkStealth } from "./stealthMethods";
 
 const getAnnouncements = async (): Promise<Annoucement[] | undefined> => {
   try {
@@ -306,21 +307,53 @@ export interface AnnouncementActionInput {
   schemeId: bigint;
 }
 
-// const scanAnnouncemets = async (
-//   spendingKey: string,
-//   viewingKey: string
-// ): Promise<Register | undefined> => {
-//   try {
-//     const announcementData = await getAnnouncements();
-//     if (!announcementData) {
-//       return;
-//     }
-//     // announcementData[0].
-//     // find the object which has the userAddress as publicAddress
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
+const scanAnnouncemets = async (
+  spendingKey: string,
+  viewingKey: string
+): Promise<Annoucement[] | undefined> => {
+  try {
+    const announcementData = await getAnnouncements();
+    if (!announcementData) {
+      return;
+    }
+
+    // filter the announcements for which checkStealth returns true ,and return those announcements
+    // const announcements = await announcementData.filter(
+    //   async (announcement: Annoucement) =>
+    //     await checkStealth(
+    //       spendingKey,
+    //       viewingKey,
+    //       announcement.stealthAddress,
+    //       announcement.ephemeralPublicKey,
+    //       announcement.viewTag
+    //     )
+    // );
+
+    let announcements: Annoucement[] = [];
+
+    // create a for loop and call checkStealth for each announcement
+    for (let i = 0; i < announcementData.length; i++) {
+      const announcement = announcementData[i];
+      const result = await checkStealth(
+        spendingKey,
+        viewingKey,
+        announcement.stealthAddress,
+        announcement.ephemeralPublicKey,
+        announcement.viewTag
+      );
+      console.log(result);
+      if (result) {
+        announcements.push(announcement);
+      }
+    }
+
+    console.log(announcements);
+    return announcements;
+    // find the object which has the userAddress as publicAddress
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 const getUserMetadatAddress = async (
   userAddress: `0x${string}`
@@ -341,4 +374,4 @@ const getUserMetadatAddress = async (
   }
 };
 
-export { getUserMetadatAddress };
+export { getUserMetadatAddress, scanAnnouncemets };
