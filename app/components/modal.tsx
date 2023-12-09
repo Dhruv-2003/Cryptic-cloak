@@ -122,7 +122,7 @@ const Modal = () => {
         return;
       }
 
-      if (tokenAddress == "0xe") {
+      if (tokenAddress === "0xe") {
         try {
           const hash = await walletClient.sendTransaction({
             account: account,
@@ -139,7 +139,7 @@ const Modal = () => {
         } catch (error) {
           console.log(error);
         }
-      } else if (tokenAddress != "0xe" && tokenAddress) {
+      } else if (tokenAddress !== "0xe" && tokenAddress) {
         // perform token Transfer
         const data = await publicClient?.simulateContract({
           account,
@@ -160,7 +160,7 @@ const Modal = () => {
           hash: hash,
         });
         console.log(transaction);
-        setTransactionHash(transaction.transactionHash);
+        setTransactionHash(hash);
       } else {
         console.log("No Token Address Found");
         return;
@@ -389,7 +389,12 @@ const Modal = () => {
                               Ephemeral Public Key
                             </p>
                             <p className="text-lg mt-1 text-gray-600">
-                              {stealthAddressData?.ephemeralPublicKey}
+                              {stealthAddressData?.ephemeralPublicKey.slice(
+                                0,
+                                15
+                              )}
+                              ....
+                              {stealthAddressData?.ephemeralPublicKey.slice(-5)}
                             </p>
                           </div>
                           <div className="mt-4 flex flex-col">
@@ -403,7 +408,8 @@ const Modal = () => {
                               Meta Address
                             </p>
                             <p className="text-lg mt-1 text-gray-600">
-                              {stealthMetaAddress}
+                              {stealthMetaAddress.slice(0, 20)}....
+                              {stealthMetaAddress.slice(-15)}
                             </p>
                           </div>
                           <div className="w-full flex mt-6 justify-between">
@@ -434,10 +440,18 @@ const Modal = () => {
                                 placeholder="0"
                                 onChange={(e) => setAmount(e.target.value)}
                               ></input>
-                              <select className="mx-2 bg-white border border-blue-500 h-12 mt-1 rounded-xl px-1 py-0.5 text-md text-blue-500 font-semibold w-1/3">
-                                <option value="1">{chain?.name}</option>
+                              <select
+                                onChange={(e) =>
+                                  // @ts-ignore
+                                  setTokenAddress(e.target.value)
+                                }
+                                className="mx-2 bg-white border border-blue-500 h-12 mt-1 rounded-xl px-1 py-0.5 text-md text-blue-500 font-semibold w-1/3"
+                              >
+                                <option value="0xe">{chain?.name}</option>
                                 {chain?.id == 80001 && (
-                                  <option value="2">Link</option>
+                                  <option value="0x326C977E6efc84E512bB9C30f76E30c160eD06FB">
+                                    Link
+                                  </option>
                                 )}
                               </select>
                             </div>
@@ -470,7 +484,8 @@ const Modal = () => {
                               Transaction hash
                             </p>
                             <p className="text-lg mt-1 text-gray-600">
-                              {transactionHash}
+                              {transactionHash?.slice(0, 15)}....
+                              {transactionHash?.slice(-5)}
                             </p>
                           </div>
                           <div className="w-full flex mt-6 justify-between">

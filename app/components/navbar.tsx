@@ -66,7 +66,7 @@ const Navbar = () => {
       const metaAddress = await getStealthMetaAddress(spendingKey, viewingKey);
       console.log(metaAddress);
       if (metaAddress) {
-        setStealthMetaAddress(metaAddress);
+        setStealthMetaAddress(metaAddress.slice(0, -1));
       }
     } catch (error) {
       console.log(error);
@@ -80,6 +80,7 @@ const Navbar = () => {
         return;
       }
       await updateRegister(userAddress, stealthMetaAddress, 0);
+      onClose();
     } catch (error) {
       console.log(error);
     }
@@ -104,18 +105,42 @@ const Navbar = () => {
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Keys Generated</ModalHeader>
+          <ModalHeader>Generate your Stealth Meta Address</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <div className="flex flex-col">
               <div className="mt-4 flex flex-col">
                 <p className="text-md text-gray-600">
+                  User app-specific Address
+                </p>
+                <p className="text-lg text-gray-800">
+                  {userAddress.slice(0, 10)}....
+                  {userAddress.slice(-15)}
+                </p>
+                <p className="text-md text-gray-600">
                   Stealth Meta data Address
                 </p>
+                {stealthMetaAddress ? (
+                  <p className="text-lg text-gray-800">
+                    {stealthMetaAddress.slice(0, 20)}....
+                    {stealthMetaAddress.slice(-15)}
+                  </p>
+                ) : (
+                  <button
+                    onClick={() => getMetaAddress()}
+                    className="px-6 mx-auto flex justify-center py-2 bg-blue-500 text-white text-xl rounded-xl font-semibold border hover:scale-105 hover:bg-white hover:border-blue-500 hover:text-blue-500 duration-200"
+                  >
+                    Generate
+                  </button>
+                )}
+
                 <p className="text-lg text-gray-800"></p>
               </div>
               <div className="mt-4 flex flex-col">
-                <button className="px-6 mx-auto flex justify-center py-2 bg-blue-500 text-white text-xl rounded-xl font-semibold border hover:scale-105 hover:bg-white hover:border-blue-500 hover:text-blue-500 duration-200">
+                <button
+                  onClick={() => registerMetaAddress()}
+                  className="px-6 mx-auto flex justify-center py-2 bg-blue-500 text-white text-xl rounded-xl font-semibold border hover:scale-105 hover:bg-white hover:border-blue-500 hover:text-blue-500 duration-200"
+                >
                   Register
                 </button>
               </div>
