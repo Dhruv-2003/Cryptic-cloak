@@ -5,10 +5,10 @@ import { AnnouncementActionInput } from "../src/state";
 
 const actionSchemaType = {
   type: "String",
-  stealthAddress: "String",
+  stealthAddress: "Address",
   ephemeralPublicKey: "Bytes",
   viewTag: "Uint",
-  publicAddress: "String",
+  publicAddress: "Address",
   stelathMetaAddress: "Bytes",
   schemeId: "Uint",
 };
@@ -18,7 +18,7 @@ const actionInput = new ActionSchema("update-announcement", actionSchemaType);
 const getData = async () => {
   const wallet = ethers.Wallet.createRandom();
 
-  const AnnounceData: AnnouncementActionInput = {
+  const AnnounceData = {
     type: "announce",
     stealthAddress: "0x084c53dad73b23f7d709fdcc2edbe5caa44bccce",
     ephemeralPublicKey:
@@ -35,6 +35,8 @@ const getData = async () => {
     actionInput.EIP712TypedData.types,
     AnnounceData
   );
+
+  // console.log(actionInput.EIP712TypedData.types);
 
   const payload = JSON.stringify({
     msgSender: wallet.address,

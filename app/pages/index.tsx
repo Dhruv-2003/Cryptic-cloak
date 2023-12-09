@@ -1,6 +1,11 @@
 import Modal from "@/components/modal";
 import Navbar from "@/components/navbar";
-import { getAnnouncements, getRegisters } from "@/utils/rollupMethods";
+import {
+  getAnnouncements,
+  getRegisters,
+  updateAnnouncement,
+  updateRegister,
+} from "@/utils/rollupMethods";
 import {
   getStealthAddress,
   getStealthMetaAddress,
@@ -25,9 +30,7 @@ export default function Home() {
   const [viewingKey, setViewingKey] = useState<string>();
   const [stealthMetaAddress, setStealthMetaAddress] = useState<string>();
   const [stealthAddress, setStealthAddress] = useState<string>();
-  const [ephemeralPublicKey, setEphemeralPublicKey] = useState<string>(
-    "0x027bee7bdcff4aaf354ccf31c4ca9c8a7039e2b8eaafa933dd3043a276d3d33765"
-  );
+  const [ephemeralPublicKey, setEphemeralPublicKey] = useState<string>();
 
   const checkFlow = async () => {
     if (!spendingKey) {
@@ -76,6 +79,17 @@ export default function Home() {
     console.log(announcemetnData);
     const registerData = await getRegisters();
     console.log(registerData);
+    await updateAnnouncement(
+      "0xf056c1bbf293799910ac551f405ac91e28e1d831",
+      "0x0397fce4b5618ea3c2f125b44e04d708b3318b9e3df4fb733d0002d105288fd54b",
+      237
+    );
+
+    await updateRegister(
+      "0xCB5160610F4655B938eE67729fD542AFb5d1586F",
+      "0x025227b7d6a0163ac13dc25854c8da65ea84a3994e3b0fb56debebac4e75ba2d7e025227b7d6a0163ac13dc25854c8da65ea84a3994e3b0fb56debebac4e75ba2d7e",
+      0
+    );
   };
 
   const signAndGenerateKey = async () => {
