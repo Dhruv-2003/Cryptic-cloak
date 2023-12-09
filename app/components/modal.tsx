@@ -27,7 +27,7 @@ const Modal = () => {
   const [stealthMetaAddress, setStealthMetaAddress] = useState<string>();
   const [tokenAddress, setTokenAddress] = useState<`0x${string}`>();
   const [amount, setAmount] = useState<string>();
-
+  const [checkReceiverData, setCheckReceiverData] = useState<boolean>(false);
   const [stealthAddressData, setStealthAddressData] = useState<{
     schemeId: string;
     stealthAddress: `0x${string}`;
@@ -77,8 +77,10 @@ const Modal = () => {
         return;
       }
       setStealthAddressData(stealthAddressData);
-
-      // await handleStepper();
+      if (stealthAddressData) {
+        await setCheckReceiverData(true);
+        await handleStepper();
+      }
     } catch (error) {
       console.log(error);
     }
@@ -142,7 +144,7 @@ const Modal = () => {
         console.log("No Token Address Found");
         return;
       }
-      // await handleStepper();
+      await handleStepper();
     } catch (error) {
       console.log(error);
     }
@@ -202,31 +204,40 @@ const Modal = () => {
                   <div className="mt-5 flex flex-col"></div>
                   {activeStep == 0 && (
                     <div>
-                      <div className="mt-5 flex flex-col">
-                        <p className="text-md text-gray-600">
-                          address of receiver
-                        </p>
-                        <input
-                          type="text"
-                          className="px-4 mt-2 py-3 border border-gray-100 rounded-xl w-full"
-                          placeholder="Enter address of receiver"
-                          onChange={(e) => setReceieverAddress(e.target.value)}
-                        ></input>
-                      </div>
-                      <div className="mt-7 mx-auto">
-                        <button
-                          onClick={() => handleGetReceiverData()}
-                          className="px-6 mx-auto flex justify-center py-2 bg-blue-500 text-white text-xl rounded-xl font-semibold border hover:scale-105 hover:bg-white hover:border-blue-500 hover:text-blue-500 duration-200"
-                        >
-                          Generate Stealth for Receiver
-                        </button>
-                      </div>
-                      <div className="mt-3 flex justify-center text-center mx-auto mb-3">
-                        <p className="text-sm text-gray-500 w-2/3 text-center">
-                          The identity of the receiver will be masked using the
-                          stealth address
-                        </p>
-                      </div>
+                      {!checkReceiverData && (
+                        <div className="flex flex-col">
+                          <div className="mt-5 flex flex-col">
+                            <p className="text-md text-gray-600">
+                              address of receiver
+                            </p>
+                            <input
+                              type="text"
+                              className="px-4 mt-2 py-3 border border-gray-100 rounded-xl w-full"
+                              placeholder="Enter address of receiver"
+                              onChange={(e) =>
+                                setReceieverAddress(e.target.value)
+                              }
+                            ></input>
+                          </div>
+                          <div className="mt-7 mx-auto">
+                            <button
+                              onClick={() => handleGetReceiverData()}
+                              className="px-6 mx-auto flex justify-center py-2 bg-blue-500 text-white text-xl rounded-xl font-semibold border hover:scale-105 hover:bg-white hover:border-blue-500 hover:text-blue-500 duration-200"
+                            >
+                              Generate Stealth for Receiver
+                            </button>
+                          </div>
+                          <div className="mt-3 flex justify-center text-center mx-auto mb-3">
+                            <p className="text-sm text-gray-500 w-2/3 text-center">
+                              The identity of the receiver will be masked using
+                              the stealth address
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                      {checkReceiverData && (
+                        <div className="flex flex-col"></div>
+                      )}
                     </div>
                   )}
                   {activeStep == 1 && (
@@ -309,7 +320,12 @@ const Modal = () => {
                 </div>
               </TabPanel>
               <TabPanel>
-                <div className="flex flex-col px-6 py-2 bg-white rounded-xl w-full mt-6"></div>
+                <div className="flex flex-col w-[460px] px-6 py-2 bg-white rounded-xl mt-6">
+                  <p className="text-lg text-center text-gray-600">
+                    Make your first Transfer or Withdrawal to create
+                    your History.
+                  </p>
+                </div>
               </TabPanel>
             </TabPanels>
           </Tabs>
