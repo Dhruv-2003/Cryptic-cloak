@@ -216,7 +216,7 @@ fn keygen(path: &PathBuf) -> std::io::Result<()> {
     let json = serde_json::to_string(&kf)?;
     let mut file = File::create(path)?;
     file.write_all(json.as_bytes())?;
-    println!("------ STEALTH META ADDRESS ------\n{}", hexlify(&sma));
+    println!("{}", hexlify(&sma));
     Ok(())
 }
 
@@ -226,11 +226,8 @@ fn show_meta_address(keyfile: &PathBuf) {
         get_pubkey_from_priv(decode_priv(&sk)),
         get_pubkey_from_priv(decode_priv(&vk)),
     );
-
-    println!(
-        "------ STEALTH META ADDRESS ------\n{}",
-        hexlify(&stealth_meta_address)
-    );
+    // ------ STEALTH META ADDRESS ------
+    println!("{}", hexlify(&stealth_meta_address));
 }
 
 fn get_meta_address(spending_key: &String, viewing_key: &String) {
@@ -241,11 +238,8 @@ fn get_meta_address(spending_key: &String, viewing_key: &String) {
         get_pubkey_from_priv(decode_priv(&sk)),
         get_pubkey_from_priv(decode_priv(&vk)),
     );
-
-    println!(
-        "------ STEALTH META ADDRESS ------\n{}",
-        hexlify(&stealth_meta_address)
-    );
+    // ------ STEALTH META ADDRESS ------
+    println!("{}", hexlify(&stealth_meta_address));
 }
 
 fn reveal_stealth_key(keyfile: &PathBuf, stealth_addr: &String, ephem_pub: &String) {
@@ -256,10 +250,8 @@ fn reveal_stealth_key(keyfile: &PathBuf, stealth_addr: &String, ephem_pub: &Stri
         &vk,
         &sk,
     );
-    println!(
-        "------ STEALTH ADDRESS PRIVATE KEY ------\n{}",
-        hexlify(&key)
-    );
+    // ------ STEALTH ADDRESS PRIVATE KEY ------\n
+    println!("{}", hexlify(&key));
 }
 
 fn reveal_stealth_key_nofile(
@@ -277,10 +269,8 @@ fn reveal_stealth_key_nofile(
         &vk,
         &sk,
     );
-    println!(
-        "------ STEALTH ADDRESS PRIVATE KEY ------\n{}",
-        hexlify(&key)
-    );
+    // ------ STEALTH ADDRESS PRIVATE KEY ------\n
+    println!("{}", hexlify(&key));
 }
 
 fn scan_for_payments(keyfile: &PathBuf, scanfile: &PathBuf) {
@@ -313,8 +303,9 @@ fn scan_for_payments(keyfile: &PathBuf, scanfile: &PathBuf) {
             v.view_tag,
         );
         if check {
+            // ------ PAYMENT FOUND ------\nstealth address: {}\nephemeral pubkey: {}
             println!(
-                "------ PAYMENT FOUND ------\nstealth address: {}\nephemeral pubkey: {}",
+                "stealth_address:{}|ephemeral_pubkey:{}",
                 v.stealth_address, v.ephemeral_pubkey,
             );
         }
@@ -325,9 +316,9 @@ fn scan_for_payments(keyfile: &PathBuf, scanfile: &PathBuf) {
 fn new_stealth_address(receiver: &String) {
     let (stealth_address, ephemeral_pubkey, view_tag) =
         generate_stealth_address(unhexlify(&receiver).as_slice().try_into().unwrap());
-
+    // ------ STEALTH ADDRESS ------\nschemeId: {}\nstealth address: {}\nephepmeral pubkey: {}\nview tag: {}
     println!(
-        "------ STEALTH ADDRESS ------\nschemeId: {}\nstealth address: {}\nephepmeral pubkey: {}\nview tag: {}",
+        "schemeId:{}|stealth_address:{}|ephepmeral_pubkey:{}|view_tag:{}",
         0,
         hexlify(&stealth_address),
         hexlify(&ephemeral_pubkey),
