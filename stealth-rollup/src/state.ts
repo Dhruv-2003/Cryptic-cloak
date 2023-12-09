@@ -1,5 +1,6 @@
 import { RollupState, STF } from "@stackr/stackr-js/execution";
 import { ethers } from "ethers";
+import MerkleTree from "merkletreejs";
 
 export type StateVariable = number;
 
