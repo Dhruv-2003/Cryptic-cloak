@@ -15,20 +15,27 @@ import {
 import { useState } from "react";
 import { getUserMetadatAddress } from "@/utils/rollupMethods";
 import { getStealthAddress } from "@/utils/stealthMethods";
-import { erc20ABI, useAccount, usePublicClient, useWalletClient } from "wagmi";
+import {
+  erc20ABI,
+  useAccount,
+  useNetwork,
+  usePublicClient,
+  useWalletClient,
+} from "wagmi";
 import { parseEther } from "viem";
 
 const Modal = () => {
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
+  const { chain, chains } = useNetwork();
 
   const [receiverAddress, setReceieverAddress] = useState<`0x${string}`>();
   const [stealthMetaAddress, setStealthMetaAddress] = useState<string>();
   const [tokenAddress, setTokenAddress] = useState<`0x${string}`>();
   const [amount, setAmount] = useState<string>();
   const [checkReceiverData, setCheckReceiverData] = useState<boolean>(false);
-  const [checkTokenTransfer, setCheckTokenTransfer] = useState<boolean>(true);
+  const [checkTokenTransfer, setCheckTokenTransfer] = useState<boolean>(false);
   const [stealthAddressData, setStealthAddressData] = useState<{
     schemeId: string;
     stealthAddress: `0x${string}`;
@@ -298,11 +305,17 @@ const Modal = () => {
                         <div className="flex flex-col">
                           <div className="mt-5 flex flex-col">
                             <p className="text-md text-gray-600">amount</p>
-                            <input
-                              className="px-4 mt-2 py-3 border border-gray-100 rounded-xl text-2xl w-full"
-                              placeholder="0"
-                              onChange={(e) => setAmount(e.target.value)}
-                            ></input>
+                            <div className="flex w-full items-center">
+                              <input
+                                className="px-4 mt-2 py-3 border border-gray-100 rounded-xl text-2xl w-3/4"
+                                placeholder="0"
+                                onChange={(e) => setAmount(e.target.value)}
+                              ></input>
+                              <select className="mx-2 bg-white border border-blue-500 h-12 mt-1 rounded-xl px-1 py-0.5 text-md text-blue-500 font-semibold w-1/3">
+                                <option value="1">{chain?.name}</option>
+                                {chain?.id == 80001 && <option value="2">Link</option>}
+                              </select>
+                            </div>
                           </div>
                           <div className="mt-7 mx-auto">
                             <button

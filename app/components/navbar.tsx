@@ -13,7 +13,6 @@ const Navbar = () => {
   const { data: walletClient } = useWalletClient();
   const [spendingKey, setSpendingKey] = useState<string>();
   const [viewingKey, setViewingKey] = useState<string>();
-  const { chain, chains } = useNetwork();
 
   const signAndGenerateKey = async () => {
     try {
@@ -48,10 +47,6 @@ const Navbar = () => {
         <p className="font-semibold text-2xl">ProjectName</p>
       </div>
       <div className="flex">
-        <select className="bg-white border border-blue-500 rounded-xl px-2 py-1 text-lg text-blue-500 font-semibold">
-          <option value="1">usdt</option>
-          <option value="2">usdc</option>
-        </select>
         <button onClick={() => signAndGenerateKey()} className='bg-white mx-3 border border-blue-500 rounded-xl px-6 py-1 text-lg text-blue-500 font-semibold'>Register</button>
         <ConnectButton accountStatus="address" showBalance={false}/>
       </div>
