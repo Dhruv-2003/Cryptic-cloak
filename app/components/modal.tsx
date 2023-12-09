@@ -14,10 +14,12 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import {
+  Annoucement,
   getUserMetadatAddress,
+  scanAnnouncemets,
   updateAnnouncement,
 } from "@/utils/rollupMethods";
-import { getStealthAddress } from "@/utils/stealthMethods";
+import { getStealthAddress, revealStealthKey } from "@/utils/stealthMethods";
 import {
   erc20ABI,
   useAccount,
@@ -25,7 +27,9 @@ import {
   usePublicClient,
   useWalletClient,
 } from "wagmi";
-import { parseEther } from "viem";
+import { createWalletClient, http, parseEther } from "viem";
+import sha256 from "sha256";
+import { privateKeyToAccount } from "viem/accounts";
 
 const Modal = () => {
   const { address: account } = useAccount();
@@ -39,12 +43,16 @@ const Modal = () => {
   const [amount, setAmount] = useState<string>();
   const [checkReceiverData, setCheckReceiverData] = useState<boolean>(false);
   const [checkTokenTransfer, setCheckTokenTransfer] = useState<boolean>(false);
+  const [spendingKey, setSpendingKey] = useState<string>();
+  const [viewingKey, setViewingKey] = useState<string>();
+  const [announcements, setAnnouncements] = useState<Annoucement[]>();
   const [stealthAddressData, setStealthAddressData] = useState<{
     schemeId: string;
     stealthAddress: `0x${string}`;
     ephemeralPublicKey: string;
     viewTag: number;
   }>();
+  const [stealthKey, setStealthKey] = useState<string>();
   const [page, setPage] = useState<number>(0);
   const [transactionHash, setTransactionHash] = useState<string>();
 
@@ -164,6 +172,32 @@ const Modal = () => {
     }
   };
 
+  const signAndGenerateKey = async () => {
+    try {
+      if (!walletClient) {
+        return;
+      }
+      const signature = await walletClient.signMessage({
+        account,
+        message:
+          "Sign this message to get access to your app-specific keys. Only Sign this Message while using this app",
+      });
+      console.log(signature);
+      const portion = signature.slice(2, 66);
+
+      const privateKey = sha256(`0x${portion}`);
+      console.log(`0x${privateKey}`);
+
+      const newAccount = privateKeyToAccount(`0x${privateKey}`);
+      console.log(newAccount);
+
+      setSpendingKey(`0x${privateKey}`);
+      setViewingKey(`0x${privateKey}`);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleAnnounce = async () => {
     try {
       if (!stealthAddressData) {
@@ -185,6 +219,85 @@ const Modal = () => {
   };
 
   // scan for the user's ephemeral public key set
+  const handleScan = async () => {
+    try {
+      if (!spendingKey || !viewingKey) {
+        console.log("Please sign and generate keys");
+        return;
+      }
+      const data = await scanAnnouncemets(spendingKey, viewingKey);
+      console.log(data);
+      if (data) {
+        setAnnouncements(data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleRevealStealthKey = async () => {
+    try {
+      if (!spendingKey || !viewingKey) {
+        console.log("Please sign and generate keys");
+        return;
+      }
+      if (!stealthAddressData) {
+        console.log("No Stealth address found");
+        return;
+      }
+      const data = await revealStealthKey(
+        spendingKey,
+        viewingKey,
+        stealthAddressData?.stealthAddress,
+        stealthAddressData?.ephemeralPublicKey
+      );
+      console.log(data);
+      if (data) {
+        setStealthKey(data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleWithdraw = async () => {
+    try {
+      if (!stealthKey) {
+        console.log("No Stealth Key Found");
+        return;
+      }
+      //@ts-ignore
+      const account = privateKeyToAccount(stealthKey);
+
+      const walletClient = createWalletClient({
+        account,
+        chain: chain,
+        transport: http(),
+      });
+
+      // withdraw the funds from the stealth address
+      // you have stelathPrivate Key
+
+      if (!amount) {
+        console.log("No Wallet Client Found");
+        return;
+      }
+      const hash = await walletClient.sendTransaction({
+        account: account,
+        //@ts-ignore
+        to: stealthAddressData.stealthAddress,
+        value: parseEther(amount),
+      });
+      console.log(hash);
+      console.log("Transaction Sent");
+      const transaction = await publicClient.waitForTransactionReceipt({
+        hash: hash,
+      });
+      console.log(transaction);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="w-screen bg-gradient-to-r from-white via-blue-100 to-rose-200">
@@ -323,7 +436,9 @@ const Modal = () => {
                               ></input>
                               <select className="mx-2 bg-white border border-blue-500 h-12 mt-1 rounded-xl px-1 py-0.5 text-md text-blue-500 font-semibold w-1/3">
                                 <option value="1">{chain?.name}</option>
-                                {chain?.id == 80001 && <option value="2">Link</option>}
+                                {chain?.id == 80001 && (
+                                  <option value="2">Link</option>
+                                )}
                               </select>
                             </div>
                           </div>
