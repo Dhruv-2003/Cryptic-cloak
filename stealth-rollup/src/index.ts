@@ -19,6 +19,9 @@ const rollup = async () => {
     stealthAddress: "String",
     ephemeralPublicKey: "String",
     viewTag: "Number",
+    publicAddress: "String",
+    stelathMetaAddress: "String",
+    schemeId: "Number",
   };
 
   const actionInput = new ActionSchema("update-announcement", actionSchemaType);
