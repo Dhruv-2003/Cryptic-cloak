@@ -15,10 +15,6 @@ const actionSchemaType = {
 
 const actionInput = new ActionSchema("update-announcement", actionSchemaType);
 
-// const getRandomValue = (array: any[]) => {
-//   return array[Math.floor(Math.random() * array.length)];
-// };
-
 const getData = async () => {
   const wallet = ethers.Wallet.createRandom();
 
@@ -55,7 +51,7 @@ const run = async () => {
   const start = Date.now();
   const payload = await getData();
 
-  const res = await fetch("http://localhost:8080/", {
+  const res = await fetch("http://localhost:8080/update", {
     method: "POST",
     body: payload,
     headers: {
@@ -72,6 +68,22 @@ const run = async () => {
 
   console.log(`Requests per second: ${requestsPerSecond.toFixed(2)}`);
   console.log("response : ", json);
+
+  // const res1 = await fetch("http://localhost:8080/announcements", {
+  //   method: "GET",
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //   },
+  // });
+  // console.log(await res1.json());
+
+  // const res2 = await fetch("http://localhost:8080/registers", {
+  //   method: "GET",
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //   },
+  // });
+  // console.log(await res2.json());
 };
 
 function delay(ms: number) {

@@ -1,5 +1,6 @@
 import Modal from "@/components/modal";
 import Navbar from "@/components/navbar";
+import { getAnnouncements } from "@/utils/rollupMethods";
 import {
   getStealthAddress,
   getStealthMetaAddress,
@@ -52,6 +53,10 @@ export default function Home() {
 
     const stealthPrivateKey = revealData;
     console.log(stealthPrivateKey);
+  };
+
+  const checkFlow2 = async () => {
+    const data = getAnnouncements();
   };
 
   return (

@@ -10,7 +10,7 @@ const getAnnouncements = async () => {
         console.log(res);
         const data = await res.json();
         console.log(data);
-        return res;
+        return data;
       })
       .catch((err) => {
         console.log(err);
