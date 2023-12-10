@@ -155,3 +155,6 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
+// export default Modal;
+// export default dynamic(() => Promise.resolve(Navbar), { ssr: false });

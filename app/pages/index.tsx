@@ -146,7 +146,7 @@ export default function Home() {
       <div className="flex flex-col justify-center mx-auto w-full">
         <Navbar />
         <div className="mx-auto w-full">
-          <button
+          {/* <button
             onClick={() => {
               signAndGenerateKey();
             }}
@@ -173,7 +173,7 @@ export default function Home() {
             }}
           >
             checkFlow3
-          </button>
+          </button> */}
           <Modal />
         </div>
       </div>

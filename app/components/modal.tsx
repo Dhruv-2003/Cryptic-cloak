@@ -50,7 +50,7 @@ import {
   AlertDialogCloseButton,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useToast } from '@chakra-ui/react'
+import { useToast } from "@chakra-ui/react";
 
 const Modal = () => {
   const { address: account } = useAccount();
@@ -62,7 +62,7 @@ const Modal = () => {
 
   const [receiverAddress, setReceieverAddress] = useState<`0x${string}`>();
   const [stealthMetaAddress, setStealthMetaAddress] = useState<string>();
-  const [tokenAddress, setTokenAddress] = useState<`0x${string}`>();
+  const [tokenAddress, setTokenAddress] = useState<`0x${string}`>("0xe");
   const [amount, setAmount] = useState<string>();
   const [checkReceiverData, setCheckReceiverData] = useState<boolean>(false);
   const [checkTokenTransfer, setCheckTokenTransfer] = useState<boolean>(false);
@@ -75,7 +75,7 @@ const Modal = () => {
     ephemeralPublicKey: string;
     viewTag: number;
   }>();
-  const toast = useToast()
+  const toast = useToast();
   const [stealthKey, setStealthKey] = useState<string>();
   const [page, setPage] = useState<number>(0);
   const [transactionHash, setTransactionHash] = useState<string>();
@@ -155,7 +155,7 @@ const Modal = () => {
         return;
       }
 
-      if (tokenAddress === "0xe") {
+      if (tokenAddress == "0xe") {
         try {
           const hash = await walletClient.sendTransaction({
             account: account,
@@ -165,6 +165,7 @@ const Modal = () => {
           });
           console.log(hash);
           console.log("Transaction Sent");
+          setTransactionHash(hash);
           const transaction = await publicClient.waitForTransactionReceipt({
             hash: hash,
           });
@@ -172,7 +173,7 @@ const Modal = () => {
         } catch (error) {
           console.log(error);
         }
-      } else if (tokenAddress !== "0xe" && tokenAddress) {
+      } else if (tokenAddress != "0xe" && tokenAddress) {
         // perform token Transfer
         const data = await publicClient?.simulateContract({
           account,
@@ -188,16 +189,17 @@ const Modal = () => {
         }
         // @ts-ignore
         const hash = await walletClient.writeContract(data.request);
+        setTransactionHash(hash);
         console.log("Transaction Sent");
         const transaction = await publicClient.waitForTransactionReceipt({
           hash: hash,
         });
         console.log(transaction);
-        setTransactionHash(hash);
+
         toast({
-          title: 'Transction completed',
+          title: "Transction completed",
           description: "Transcation has been successfully completed",
-          status: 'success',
+          status: "success",
           duration: 9000,
           isClosable: true,
         });
@@ -252,8 +254,16 @@ const Modal = () => {
         stealthAddressData.viewTag
       );
 
-      await handleStepper();
-      await setAnnounced(true);
+      handleStepper();
+      setAnnounced(true);
+
+      toast({
+        title: "Announcement completed",
+        description: "Announcement has been successfully completed",
+        status: "success",
+        duration: 9000,
+        isClosable: true,
+      });
     } catch (error) {
       console.log(error);
     }
@@ -295,7 +305,8 @@ const Modal = () => {
       );
       console.log(data);
       if (data) {
-        setStealthKey(data);
+        const formatted = data.slice(0, 66);
+        setStealthKey(formatted);
       }
     } catch (error) {
       console.log(error);
@@ -309,6 +320,7 @@ const Modal = () => {
         return;
       }
       //@ts-ignore
+      console.log(stealthKey);
       const account = privateKeyToAccount(stealthKey);
 
       const walletClient = createWalletClient({
@@ -327,10 +339,11 @@ const Modal = () => {
       const hash = await walletClient.sendTransaction({
         account: account,
         //@ts-ignore
-        to: stealthAddressData.stealthAddress,
+        to: receiverAddress,
         value: parseEther(amount),
       });
       console.log(hash);
+      setTransactionHash(hash);
       console.log("Transaction Sent");
       const transaction = await publicClient.waitForTransactionReceipt({
         hash: hash,
@@ -540,9 +553,15 @@ const Modal = () => {
                             <p className="text-md text-gray-600">
                               Transaction hash
                             </p>
-                            <p className="text-lg mt-1 text-gray-600">
-                              ({chain?.blockExplorers}/tx/${transactionHash})
-                            </p>
+                            <a
+                              target="_blank"
+                              href={`${chain?.blockExplorers}/tx/${transactionHash}`}
+                              className="text-lg mt-1 text-gray-600"
+                            >
+                              {/* {transactionHash.slice(0, 15)}....
+                              {transactionHash?.slice(-5)} */}
+                              {transactionHash}
+                            </a>
                           </div>
                           <div className="w-full flex mt-6 justify-between">
                             <button
@@ -603,7 +622,7 @@ const Modal = () => {
                   <div className="mt-4 flex flex-col">
                     <p className="text-md text-gray-600">Sending Funds from</p>
                     <p className="text-sm mt-1.5 text-gray-600">
-                      {chooseStealthAddress}
+                      {stealthAddressData?.stealthAddress}
                     </p>
                   </div>
                   <div className="mt-5 flex flex-col">
@@ -625,9 +644,14 @@ const Modal = () => {
                       address of receiving wallet
                     </p>
                     <input
+                      onChange={(e) => setReceieverAddress(e.target.value)}
                       className="px-4 mt-2 py-3 border border-gray-100 rounded-xl w-[420px]"
                       placeholder="Enter address of receiving wallet"
                     ></input>
+                  </div>
+                  <div className="mt-5 flex flex-col">
+                    <p className="text-md text-gray-600">txhash</p>
+                    <p className="text-md text-gray-600">{transactionHash}</p>
                   </div>
                   <div className="mt-7 mx-auto">
                     <button
@@ -683,7 +707,10 @@ const Modal = () => {
                   <div className="flex flex-col justify-center mx-auto mt-6 w-full">
                     {spendingKey ? (
                       <button
-                        onClick={() => handleSwitchToTab(1)}
+                        onClick={() => {
+                          handleSwitchToTab(1);
+                          setTransactionHash("");
+                        }}
                         className="px-6 py-2 w-2/3 mx-auto bg-blue-500 text-white text-xl rounded-xl font-semibold border hover:scale-105 hover:bg-white hover:border-blue-500 hover:text-blue-500 duration-200"
                       >
                         Withdraw
@@ -735,5 +762,7 @@ const Modal = () => {
     </div>
   );
 };
+// import dynamic from "next/dynamic";
 
 export default Modal;
+// export default dynamic(() => Promise.resolve(Modal), { ssr: false });
